@@ -1,0 +1,214 @@
+---
+products:
+    new:
+        limit: {{theme_settings.homepage_new_products_count}}
+    featured:
+        limit: {{theme_settings.homepage_featured_products_count}}
+    top_sellers:
+        limit: {{theme_settings.homepage_top_products_count}}
+carousel: {{theme_settings.homepage_show_carousel}}
+blog:
+    recent_posts:
+        limit: {{theme_settings.homepage_blog_posts_count}}
+---
+{{#partial "hero"}}
+    {{{region name="home_below_menu"}}}
+    {{#if carousel}}
+        {{> components/carousel arrows=theme_settings.homepage_show_carousel_arrows}}
+    {{/if}}
+    {{{region name="home_below_carousel"}}}
+{{/partial}}
+
+{{#partial "page"}}
+
+    {{#each shipping_messages}}
+        {{> components/common/alert-info message}}
+    {{/each}}
+{{#if banners.top}}
+<div class="banners" data-banner-location="top">
+    {{#each (limit banners.top_metadata 1)}}
+    <div class="banner" data-event-type="promotion" data-entity-id="{{this.id}}" data-name="{{this.banner-name}}" data-position="{{this.location}}" data-banner-id="{{this.banner-name}}">
+        <div data-event-type="promotion-click">
+            {{{this.content}}}
+        </div>
+    </div>
+    {{/each}}
+</div>
+{{/if}}
+<div class="main full">
+    <div class="block-categories">
+        <div class="container">
+            <div class="row"> 
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="block banner-product ApImage">
+    
+                        <div class="media">
+                            <div class="left-block">
+                                <a class="image" href="{{theme_settings.banner1_url}}">
+                                        <img src="/product_images/uploaded_images/{{theme_settings.url_img1}}" alt="{{theme_settings.alt_img1}}">
+                                </a>
+                            </div>
+                            <div class="right-block">
+                                <div class="image_description">
+                                    <p>{{theme_settings.banner1_line1}}</p>
+                                    <h3>{{theme_settings.banner1_line2}}</h3>
+                                    <h3>{{theme_settings.banner1_line3}}</h3>
+                                    <p><a href="{{theme_settings.banner1_url}}" class="btn btn-default">{{theme_settings.banner1_button}}</a></p>
+                                </div>
+                            </div>
+                         </div>
+   
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="block banner-product ApImage">
+    
+                        <div class="media">
+                            <div class="left-block">
+                                <a class="image" href="{{theme_settings.banner2_url}}">
+                                        <img src="/product_images/uploaded_images/{{theme_settings.url_img2}}" alt="{{theme_settings.alt_img2}}">
+
+                                </a>
+                            </div>
+                            <div class="right-block">
+                                <div class="image_description">
+                                    <p>{{theme_settings.banner2_line1}}</p>
+                                    <h3>{{theme_settings.banner2_line2}}</h3>
+                                    <h3>{{theme_settings.banner2_line3}}</h3>
+                                    <p><a href="{{theme_settings.banner2_url}}" class="btn btn-default">{{theme_settings.banner2_button}}</a></p>
+                                </div>
+                            </div>
+                         </div>
+   
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 col-xs-12">
+                    <div class="block banner-product ApImage">
+    
+                        <div class="media">
+                            <div class="left-block">
+                                <a class="image" href="{{theme_settings.banner3_url}}">
+                                        <img src="/product_images/uploaded_images/{{theme_settings.url_img3}}" alt="{{theme_settings.alt_img3}}">
+
+                                </a>
+                            </div>
+                            <div class="right-block">
+                                <div class="image_description">
+                                    <p>{{theme_settings.banner3_line1}}</p>
+                                    <h3>{{theme_settings.banner3_line2}}</h3>
+                                    <h3>{{theme_settings.banner3_line3}}</h3>
+                                    <p><a href="{{theme_settings.banner3_url}}" class="btn btn-default">{{theme_settings.banner3_button}}</a></p>                
+                                </div>
+                            </div>
+                         </div>
+   
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    {{#if products.featured}}
+    <div class="container">
+        <div class="row"> 
+        {{> components/products/featured products=products.featured columns=theme_settings.homepage_featured_products_column_count}}
+        </div>
+    </div>
+    {{/if}}
+    {{{region name="home_below_featured_products"}}}
+    <div class="custom-html">
+        <div class="container">
+            <div class="row">
+                <div class="block infor-product title ApHtml">
+                    <h4 class="title_block">{{theme_settings.bwt_title}}</h4>
+                    <div class="sub-title-widget">{{theme_settings.bwt_subtitle}}</div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 col-sp-12  ApColumn">
+                    <div class="block_content">
+                        <div class="infor-product text-left">
+                            <h3>{{theme_settings.bwt_block1_line1}}</h3>
+                            <p>{{theme_settings.bwt_block1_line2}}</p>
+                        </div>
+                        <div class="infor-product text-left">
+                            <h3>{{theme_settings.bwt_block1_line3}}</h3>
+                            <p>{{theme_settings.bwt_block1_line4}}</p>
+                        </div>
+                        <div class="infor-product text-left">
+                            <h3>{{theme_settings.bwt_block1_line5}}</h3>
+                            <p>{{theme_settings.bwt_block1_line6}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-4 col-sm-12 col-xs-12 col-sp-12  ApColumn">
+                    <div class="block infor-product image-product ApImage">
+                        <a href="{{theme_settings.bwt_url_button}}">
+                            <img src="/product_images/uploaded_images/{{theme_settings.bwt_img}}" class="img-fluid" alt="{{theme_settings.bwt_alt}}">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 col-sp-12  ApColumn">
+                    <div class="block_content">
+                        <div class="infor-product text-right">
+                            <h3>{{theme_settings.bwt_block3_line1}}</h3>
+                            <p>{{theme_settings.bwt_block3_line2}}</p>
+                        </div>
+                        <div class="infor-product text-right">
+                            <h3>{{theme_settings.bwt_block3_line3}}</h3>
+                            <p>{{theme_settings.bwt_block3_line4}}</p>
+                        </div>
+                        <div class="infor-product text-right">
+                            <h3>{{theme_settings.bwt_block3_line5}}</h3>
+                            <p>{{theme_settings.bwt_block3_line6}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-xs-12 col-sp-12 col-md-12 col-lg-12 col-xl-12  ApColumn ">
+                    <div class="block infor-product link-btn ApHtml">
+                        <div class="block_content">
+                            <p><a href="{{theme_settings.bwt_url_button}}" class="btn btn-default">{{theme_settings.bwt_name_button}}</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{#if products.new}}
+    <div class="container">
+        <div class="row"> 
+        {{> components/products/new products=products.new columns=theme_settings.homepage_new_products_column_count}}
+        </div>
+    </div>
+    {{/if}}
+    {{{region name="home_below_new_products"}}}
+     {{#if products.top_sellers}}
+     <div class="container">
+        <div class="row"> 
+            {{> components/products/top products=products.top_sellers columns=theme_settings.homepage_top_products_column_count}}
+        </div>
+    </div>    
+    {{/if}}
+    {{{region name="home_below_top_products"}}}
+    
+    <div class="block banner-text-full text-block btn-black ApImage">
+
+        <div class="media">
+            <div class="left-block">
+                <a class="image" href="{{theme_settings.bwtb_url_button}}">
+                    <img src="/product_images/uploaded_images/{{theme_settings.bwtb_img}}" alt="{{theme_settings.bwtb_alt}}">
+                </a>
+            </div>
+            <div class="right-block">
+                <div class="image_description">
+                    <h5>{{theme_settings.bwtb_line1}}</h5>
+                    <h3>{{theme_settings.bwtb_line2}}</h3>
+                    <p>{{theme_settings.bwtb_line3}}</p>
+                    <p>{{theme_settings.bwtb_line4}}</p>
+                    <p><a href="{{theme_settings.bwtb_url_button}}" class="btn btn-default">{{theme_settings.bwtb_name_button}}</a></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{{/partial}}
+{{> layout/base}}

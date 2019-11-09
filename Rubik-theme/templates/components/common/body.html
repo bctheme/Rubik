@@ -1,0 +1,12 @@
+<div class="body {{#if template_file '!==''pages/home' }}no-margin{{/if}}" data-currency-code="{{currency_selector.active_currency_code}}">
+    {{#block "hero"}} {{/block}}
+    {{#if template_file '===''pages/home' }}
+    {{#block "page"}} {{/block}}
+    {{else}}
+    <div class="container">
+        {{#block "page"}} {{/block}}
+    </div>
+    {{/if}}
+    {{> components/common/modal}}
+    {{> components/common/alert-modal}}
+</div>

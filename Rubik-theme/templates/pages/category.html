@@ -1,0 +1,81 @@
+---
+category:
+    shop_by_price: true
+    products:
+        limit: {{theme_settings.categorypage_products_per_page}}
+---
+{{inject "categoryProductsPerPage" theme_settings.categorypage_products_per_page}}
+{{#partial "head"}}
+    {{#if pagination.category.previous}}
+        <link rel="prev" href="{{pagination.category.previous}}">
+    {{/if}}
+    {{#if pagination.category.next}}
+        <link rel="next" href="{{pagination.category.next}}">
+    {{/if}}
+{{/partial}}
+
+{{#partial "page"}}
+
+{{> components/common/breadcrumbs breadcrumbs=breadcrumbs}}
+
+<div class="page">
+    {{#if category.faceted_search_enabled}}
+        <aside class="page-sidebar" id="faceted-search-container">
+            {{> components/category/sidebar}}
+        </aside>
+    {{else if category.subcategories}}
+        <aside class="page-sidebar" id="faceted-search-container">
+            {{> components/category/sidebar}}
+        </aside>
+    {{else if category.shop_by_price}}
+        {{#if theme_settings.shop_by_price_visibility}}
+             <aside class="page-sidebar" id="faceted-search-container">
+                {{> components/category/sidebar}}
+            </aside>
+        {{/if}}
+    {{/if}}
+
+    <main class="page-content" id="product-listing-container">
+        <div class="des-category-page">
+            {{#if category.image}}
+                {{> components/common/responsive-img
+                    image=category.image
+                }}
+            {{/if}}
+            {{#unless theme_settings.hide_category_page_heading }}
+                <h1 class="page-heading">{{category.name}}</h1>
+                {{{region name="category_below_header"}}}
+            {{/unless}}
+            <div class="main-des">
+                {{{category.description}}}
+            </div>
+            {{#if category.subcategories}}
+                <div class="subcategories">
+                    <ul class="subcategories-list row">
+                        {{#each category.subcategories}}
+                        <li class="navList-item">
+                            <a href="{{url}}">
+                            {{#if image}}
+                            {{> components/common/responsive-img
+                                image=image
+                            }}
+                            {{/if}}
+                            </a>
+                            <a class="navList-action" href="{{url}}" alt="{{name}}" title="{{name}}">{{name}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            {{/if}}
+        </div> 
+        {{#if category.products}}
+            {{> components/category/product-listing}}
+        {{else}}
+            <p>{{lang 'categories.no_products'}}</p>
+        {{/if}}
+        {{{region name="category_below_content"}}}
+    </main>
+</div>
+
+{{/partial}}
+{{> layout/base}}

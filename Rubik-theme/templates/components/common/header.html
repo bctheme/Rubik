@@ -1,0 +1,61 @@
+<header class="header" role="banner">
+    <a href="#" class="mobileMenu-toggle" data-mobile-menu-toggle="menu">
+        <span class="mobileMenu-toggleIcon">Toggle menu</span>
+    </a>
+    <div class="header-top">
+        <div class="container">
+            <div class="row"> 
+            {{> components/common/navigation}}
+            </div>
+        </div>
+    </div>
+    <div class="header-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="dropdown dropdown--quickSearch" id="quickSearch" aria-hidden="true" tabindex="-1" data-prevent-quick-search-close>
+                        {{> components/common/quick-search}}
+                    </div>
+                <div class="hb-logo col-md-2 col-sm-12 col-xs-12">
+                {{#if page_type '===' 'default'}}
+                    <h1 class="header-logo">
+                        {{> components/common/store-logo}}
+                    </h1>
+                {{else}}
+                    <div class="header-logo">
+                        {{> components/common/store-logo}}
+                    </div>
+                {{/if}}
+                </div>
+                <div class="hb-menu col-md-7">
+                    <div class="navPages-container" id="menu" data-menu>
+                        {{> components/common/navigation-menu}}
+                    </div>
+                </div>
+                <div class="hb-buttons col-md-3">
+                    <div class="hd-nav">
+                        <a class="navUser-action navUser-action--quickSearch" href="#" data-search="quickSearch" aria-controls="quickSearch" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="1.02em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1040 1024"><path d="M1031 969L720 656q93-111 93-256q0-109-53.5-201t-146-145.5T412.5 0T212 53.5T66.5 199T13 400t53.5 201T212 746.5T413 800q149 0 262-98l310 312q10 10 23 10t22.5-9.5t9.5-23t-9-22.5zM413 737q-92 0-169.5-45.5T121 568.5T76 400t45-168.5t122.5-123t169-45.5t169 45.5t122.5 123T749 400q0 39-9 77t-25.5 71t-39.5 62.5t-52 52.5t-62 39.5t-71 25.5t-77 9z"/><rect x="0" y="0" width="1040" height="1024" fill="rgba(0, 0, 0, 0)" /></svg>
+                        </a>
+                    </div>
+                    <div class="hd-nav navUser-item--cart">
+                        <a
+                            class="navUser-action"
+                            data-cart-preview
+                            data-dropdown="cart-preview-dropdown"
+                            data-options="align:right"
+                            href="{{urls.cart}}">
+                            <span class="navUser-item-cartLabel">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="0.82em" height="1em" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 832 1024"><path d="M768 159H577V97q0-26-13-48t-35-35t-48-13H353q-15 0-30 5t-26.5 14T276 40.5T262 67t-5 30v62H64q-27 0-45.5 18.5T0 223v736q0 26 18.5 45t45.5 19h704q27 0 45.5-19t18.5-45V223q0-27-18.5-45.5T768 159zM321 97q0-13 9.5-22.5T353 65h128q13 0 22.5 9.5T513 97v62H321V97zm447 862H64V223h193v66q0 3 1 8.5t8.5 14.5t22.5 9q16 0 24-8t8-16v-74h192v69l1.5 7.5l4.5 10l9.5 8L545 321q9 0 15.5-3.5t9.5-8t4.5-9.5t2.5-8v-69h191v736z"/><rect x="0" y="0" width="832" height="1024" fill="rgba(0, 0, 0, 0)" /></svg>
+                            </span>
+                            <span class="countPill cart-quantity 1ws">{{cart.quantity}}</span>
+                        </a>
+
+                        <div class="dropdown-menu" id="cart-preview-dropdown" data-dropdown-content aria-hidden="true"></div>
+                    </div>    
+                    
+                </div>
+            </div>
+        </div>     
+    </div>
+</header>
+{{{region name="header_bottom"}}}

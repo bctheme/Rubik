@@ -1,0 +1,1607 @@
+$nocolor:             transparent;
+
+$font-icon           :       "FontAwesome";
+$rtl-left : left;
+$rtl-right : right;
+$theme-gutter-width: 30px;
+$grid-gutter-mobile: 22px;
+
+$gutter-site: 55px;
+$gutter-site-mobile: 22px;
+$section-spacing: 55px;
+$section-spacing-small: 35px;
+$border-radius: 2px;
+
+//== Media queries breakpoints
+$screen-xs:                  480px;
+$screen-xs-min:              $screen-xs;
+$screen-phone:               $screen-xs-min;
+
+// Small screen / tablet
+// Note: Deprecated $screen-sm and $screen-tablet as of v3.0.1
+$screen-sm:                  768px;
+$screen-sm-min:              $screen-sm;
+$screen-tablet:              $screen-sm-min;
+
+// Medium screen / desktop
+// Note: Deprecated $screen-md and $screen-desktop as of v3.0.1
+$screen-md:                  992px;
+$screen-md-min:              $screen-md;
+$screen-desktop:             $screen-md-min;
+
+// Large screen / wide desktop
+// Note: Deprecated $screen-lg and $screen-lg-desktop as of v3.0.1
+$screen-lg:                  1200px;
+$screen-lg-min:              $screen-lg;
+$screen-lg-desktop:          $screen-lg-min;
+
+// So media queries don't overlap when required, provide a maximum
+$screen-xs-max:              ($screen-sm-min - 1);
+$screen-sm-max:              ($screen-md-min - 1);
+$screen-md-max:              ($screen-lg-min - 1);
+
+
+//== Grid system
+//
+//## Define your custom responsive grid.
+
+//** Number of columns in the grid.
+$grid-columns:              12;
+//** Padding between columns. Gets divided in half for the left and right.
+$grid-gutter-width:         $theme-gutter-width;
+// Navbar collapse
+//** Point at which the navbar becomes uncollapsed.
+$grid-float-breakpoint:     $screen-md-min;
+//** Point at which the navbar begins collapsing.
+$grid-float-breakpoint-max: ($grid-float-breakpoint - 1);
+
+//## Define the maximum width of `.container` for different screen sizes.
+
+// Small screen / tablet
+$container-tablet:             ((750px + $grid-gutter-width));
+//** For `$screen-sm-min` and up.
+$container-sm:                 $container-tablet;
+
+// Medium screen / desktop
+$container-desktop:            ((940px + $grid-gutter-width));
+//** For `$screen-md-min` and up.
+$container-md:                 $container-desktop;
+
+// Large screen / wide desktop
+$container-large-desktop:      ((1170px + $grid-gutter-width));
+//** For `$screen-lg-min` and up.
+$container-lg:                 $container-large-desktop;
+
+/*================ #Mixins all ================*/
+
+@mixin clearfix() {
+  &:before,
+  &:after {
+    content: " "; // 1
+    display: table; // 2
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+@mixin prefix($property, $value, $prefixes) {
+  @each $prefix in $prefixes {
+    @if $prefix == webkit {
+      -webkit-#{$property}: $value;
+    } @else if $prefix == moz {
+      -moz-#{$property}: $value;
+    } @else if $prefix == ms {
+      -ms-#{$property}: $value;
+    } @else if $prefix == o {
+      -o-#{$property}: $value;
+    } @else if $prefix == spec {
+      #{$property}: $value;
+    } @else  {
+      @warn 'Unrecognized prefix: #{$prefix}';
+    }
+  }
+}
+
+@mixin user-select($value: none) {
+  @include prefix('user-select', #{$value}, moz ms webkit spec);
+}
+
+
+/*================ Responsive Show/Hide Helper ================*/
+@mixin responsive-display-helper($grid-breakpoint-type: '') {
+  .#{$grid-breakpoint-type}show {
+    display: block !important;
+  }
+  .#{$grid-breakpoint-type}hide {
+    display: none !important;
+  }
+}
+
+
+/*================ Responsive Text Alignment Helper ================*/
+@mixin responsive-text-align-helper($grid-breakpoint-type: '') {
+  // sass-lint:disable no-important
+  .#{$grid-breakpoint-type}text-left {
+    text-align: left !important;
+  }
+
+  .#{$grid-breakpoint-type}text-right {
+    text-align: right !important;
+  }
+
+  .#{$grid-breakpoint-type}text-center {
+    text-align: center !important;
+  }
+}
+
+@mixin placeholder-text($color: $color-text-field-text, $opacity: 0.6) {
+  color: $color;
+  opacity: $opacity;
+}
+
+@mixin error-placeholder-text($color: $color-error-input-text, $opacity: 0.5) {
+  color: $color;
+  opacity: $opacity;
+}
+
+
+@mixin spinner($size: 20px, $color: $color-btn-primary-text) {
+  content: '';
+  display: block;
+  width: $size;
+  height: $size;
+  position: absolute;
+  margin-left: - $size / 2;
+  margin-top: - $size / 2;
+  border-radius: 50%;
+  border: 3px solid $color;
+  border-top-color: transparent;
+}
+
+@mixin visually-hidden() {
+  // sass-lint:disable no-important
+  position: absolute !important;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
+@mixin visually-shown() {
+  // sass-lint:disable no-important
+  position: inherit !important;
+  overflow: auto;
+  clip: auto;
+  width: auto;
+  height: auto;
+  margin: 0;
+}
+
+@mixin overlay($z-index: null) {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: $color-image-overlay;
+    opacity: $opacity-image-overlay;
+
+    @if ($z-index) {
+      z-index: $z-index;
+    }
+  }
+}
+
+/*============================================================================
+  Flexbox prefix mixins from Bourbon
+    https://github.com/thoughtbot/bourbon/blob/master/app/assets/stylesheets/css3/_flex-box.scss
+==============================================================================*/
+@mixin display-flexbox() {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+@mixin row-flex(){
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex: 0 1 auto;
+  flex: 0 1 auto;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
+
+@mixin flex-wrap($value: nowrap) {
+  @include prefix(flex-wrap, $value, webkit moz ms spec);
+}
+
+@mixin flex-direction($value) {
+  @include prefix(flex-direction, $value, webkit moz ms spec);
+}
+
+@mixin align-items($value: stretch) {
+  $alt-value: $value;
+
+  @if $value == 'flex-start' {
+    $alt-value: start;
+  } @else if $value == 'flex-end' {
+    $alt-value: end;
+  }
+
+  // sass-lint:disable no-misspelled-properties
+  -ms-flex-align: $alt-value;
+  @include prefix(align-items, $value, webkit moz ms o spec);
+}
+
+@mixin flex($value) {
+  @include prefix(flex, $value, webkit moz ms spec);
+}
+
+@mixin flex-basis($width: auto) {
+  // sass-lint:disable no-misspelled-properties
+  -ms-flex-preferred-size: $width;
+  @include prefix(flex-basis, $width, webkit moz spec);
+}
+
+@mixin align-self($align: auto) {
+  // sass-lint:disable no-misspelled-properties
+  -ms-flex-item-align: $align;
+  @include prefix(align-self, $align, webkit spec);
+}
+
+@mixin justify-content($justify: flex-start) {
+  @include prefix(justify-content, $justify, webkit ms spec);
+}
+
+//mixin apollo
+@mixin tab-focus() {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+@mixin center-block() {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+@mixin square($size) {
+  @include size($size, $size);
+}
+@mixin placeholder($color: $input-color-placeholder) {
+  &::-moz-placeholder           { color: $color;   // Firefox
+                                opacity: 1; } // See https://github.com/twbs/bootstrap/pull/11526
+  &:-ms-input-placeholder       { color: $color; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { color: $color; } // Safari and Chrome
+}
+@mixin text-overflow() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@mixin hide-text() {
+  font: #{0/0} a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+@mixin text-hide() {
+  @include hide-text();
+}
+@mixin border-top-radius($radius) {
+  border-top-right-radius: $radius;
+  border-top-left-radius: $radius;
+}
+@mixin border-right-radius($radius) {
+  border-bottom-right-radius: $radius;
+  border-top-right-radius: $radius;
+}
+@mixin border-bottom-radius($radius) {
+  border-bottom-right-radius: $radius;
+  border-bottom-left-radius: $radius;
+}
+@mixin border-left-radius($radius) {
+  border-bottom-left-radius: $radius;
+  border-top-left-radius: $radius;
+}
+@mixin box-shadow($shadow...) {
+  -webkit-box-shadow: $shadow; // iOS <4.3 & Android <4.1
+  box-shadow: $shadow;
+}
+@mixin transition($transition...) {
+  -webkit-transition: $transition;
+      transition: $transition;
+}
+@mixin transition-property($transition-property...) {
+  -webkit-transition-property: $transition-property;
+      transition-property: $transition-property;
+}
+@mixin transition-delay($transition-delay) {
+  -webkit-transition-delay: $transition-delay;
+          transition-delay: $transition-delay;
+}
+@mixin transition-duration($transition-duration...) {
+  -webkit-transition-duration: $transition-duration;
+          transition-duration: $transition-duration;
+}
+@mixin transition-transform($transition...) {
+  -webkit-transition: -webkit-transform $transition;
+     -moz-transition: -moz-transform $transition;
+       -o-transition: -o-transform $transition;
+          transition: transform $transition;
+}
+@mixin rotate($degrees) {
+  -webkit-transform: rotate($degrees);
+      -ms-transform: rotate($degrees); // IE9 only
+          transform: rotate($degrees);
+}
+@mixin scale($scale-args...) {
+  -webkit-transform: scale($scale-args);
+      -ms-transform: scale($scale-args); // IE9 only
+          transform: scale($scale-args);
+}
+@mixin translate($x, $y) {
+  -webkit-transform: translate($x, $y);
+      -ms-transform: translate($x, $y); // IE9 only
+          transform: translate($x, $y);
+}
+@mixin skew($x, $y) {
+  -webkit-transform: skew($x, $y);
+      -ms-transform: skewX($x) skewY($y); // See https://github.com/twbs/bootstrap/issues/4885; IE9+
+          transform: skew($x, $y);
+}
+@mixin translate3d($x, $y, $z) {
+  -webkit-transform: translate3d($x, $y, $z);
+          transform: translate3d($x, $y, $z);
+}
+
+@mixin rotateX($degrees) {
+  -webkit-transform: rotateX($degrees);
+      -ms-transform: rotateX($degrees); // IE9 only
+          transform: rotateX($degrees);
+}
+@mixin rotateY($degrees) {
+  -webkit-transform: rotateY($degrees);
+      -ms-transform: rotateY($degrees); // IE9 only
+          transform: rotateY($degrees);
+}
+@mixin perspective($perspective) {
+  -webkit-perspective: $perspective;
+     -moz-perspective: $perspective;
+          perspective: $perspective;
+}
+@mixin perspective-origin($perspective) {
+  -webkit-perspective-origin: $perspective;
+     -moz-perspective-origin: $perspective;
+          perspective-origin: $perspective;
+}
+@mixin transform-origin($origin) {
+  -webkit-transform-origin: $origin;
+     -moz-transform-origin: $origin;
+      -ms-transform-origin: $origin; // IE9 only
+          transform-origin: $origin;
+}
+@mixin animation($animation) {
+  -webkit-animation: $animation;
+          animation: $animation;
+}
+@mixin animation-fill($animation-fill-mode){
+  -webkit-animation-fill-mode: $animation-fill-mode;
+   -moz-animation-fill-mode: $animation-fill-mode;
+   -ms-animation-fill-mode: $animation-fill-mode;
+   -o-animation-fill-mode: $animation-fill-mode;
+   animation-fill-mode: $animation-fill-mode;
+ }
+@mixin animation-name($name) {
+  -webkit-animation-name: $name;
+          animation-name: $name;
+}
+@mixin animation-duration($duration) {
+  -webkit-animation-duration: $duration;
+          animation-duration: $duration;
+}
+@mixin animation-timing-function($timing-function) {
+  -webkit-animation-timing-function: $timing-function;
+          animation-timing-function: $timing-function;
+}
+@mixin animation-delay($delay) {
+  -webkit-animation-delay: $delay;
+          animation-delay: $delay;
+}
+@mixin animation-iteration-count($iteration-count) {
+  -webkit-animation-iteration-count: $iteration-count;
+          animation-iteration-count: $iteration-count;
+}
+@mixin animation-direction($direction) {
+  -webkit-animation-direction: $direction;
+          animation-direction: $direction;
+}
+@mixin box-sizing($boxmodel) {
+  -webkit-box-sizing: $boxmodel;
+     -moz-box-sizing: $boxmodel;
+          box-sizing: $boxmodel;
+}
+@mixin resizable($direction) {
+  resize: $direction; // Options: horizontal, vertical, both
+  overflow: auto; // Safari fix
+}
+@mixin content-columns($column-count, $column-gap: $grid-gutter-width) {
+  -webkit-column-count: $column-count;
+     -moz-column-count: $column-count;
+          column-count: $column-count;
+  -webkit-column-gap: $column-gap;
+     -moz-column-gap: $column-gap;
+          column-gap: $column-gap;
+}
+@mixin hyphens($mode: auto) {
+  word-wrap: break-word;
+  -webkit-hyphens: $mode;
+     -moz-hyphens: $mode;
+      -ms-hyphens: $mode; // IE10+
+       -o-hyphens: $mode;
+          hyphens: $mode;
+}
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  $opacity-ie: ($opacity * 100);
+  filter: #{alpha(opacity=$opacity-ie)};
+}
+$min: min-width;
+$max: max-width;
+@mixin at-query ($constraint, $viewport1, $viewport2:null) {
+  @if $constraint == $min {
+      @media screen and ($min: $viewport1) {
+          @content;
+      }
+  } @else if $constraint == $max {
+      @media screen and ($max: $viewport1) {
+          @content;
+      }
+  } @else {
+      @media screen and ($min: $viewport1) and ($max: $viewport2) {
+          @content;
+      }
+  }
+}
+@mixin gradient-horizontal($start-color: #555, $end-color: #333, $start-percent: 0%, $end-percent: 100%) {
+  background-image: -webkit-linear-gradient(left, color-stop($start-color $start-percent), color-stop($end-color $end-percent)); // Safari 5.1-6, Chrome 10+
+  background-image:  linear-gradient(to right, $start-color $start-percent, $end-color $end-percent); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start-color)}', endColorstr='#{ie-hex-str($end-color)}', GradientType=1); // IE9 and down
+}
+@mixin gradient-vertical($start-color: #555, $end-color: #333, $start-percent: 0%, $end-percent: 100%) {
+  background-image: -webkit-linear-gradient(top, $start-color $start-percent, $end-color $end-percent);  // Safari 5.1-6, Chrome 10+
+  background-image: linear-gradient(to bottom, $start-color $start-percent, $end-color $end-percent); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start-color)}', endColorstr='#{ie-hex-str($end-color)}', GradientType=0); // IE9 and down
+}
+
+@mixin gradient-directional($start-color: #555, $end-color: #333, $deg: 45deg) {
+  background-repeat: repeat-x;
+  background-image: -webkit-linear-gradient($deg, $start-color, $end-color); // Safari 5.1-6, Chrome 10+
+  background-image: linear-gradient($deg, $start-color, $end-color); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+}
+@mixin gradient-horizontal-three-colors($start-color: #00b3ee, $mid-color: #7a43b6, $color-stop: 50%, $end-color: #c3325f) {
+  background-image: -webkit-linear-gradient(left, $start-color, $mid-color $color-stop, $end-color);
+  background-image: linear-gradient(to right, $start-color, $mid-color $color-stop, $end-color);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start-color)}', endColorstr='#{ie-hex-str($end-color)}', GradientType=1); // IE9 and down, gets no color-stop at all for proper fallback
+}
+@mixin gradient-vertical-three-colors($start-color: #00b3ee, $mid-color: #7a43b6, $color-stop: 50%, $end-color: #c3325f) {
+  background-image: -webkit-linear-gradient($start-color, $mid-color $color-stop, $end-color);
+  background-image: linear-gradient($start-color, $mid-color $color-stop, $end-color);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start-color)}', endColorstr='#{ie-hex-str($end-color)}', GradientType=0); // IE9 and down, gets no color-stop at all for proper fallback
+}
+@mixin gradient-radial($inner-color: #555, $outer-color: #333) {
+  background-image: -webkit-radial-gradient(circle, $inner-color, $outer-color);
+  background-image: radial-gradient(circle, $inner-color, $outer-color);
+  background-repeat: no-repeat;
+}
+@mixin gradient-striped($color: rgba(255,255,255,.15), $angle: 45deg) {
+  background-image: -webkit-linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent);
+  background-image: linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent);
+}
+@mixin reset-filter() {
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+}
+@mixin img-retina($file-1x, $file-2x, $width-1x, $height-1x) {
+  background-image: url(if($bootstrap-sass-asset-helper, twbs-image-path("#{$file-1x}"), "#{$file-1x}"));
+
+  @media
+  only screen and (-webkit-min-device-pixel-ratio: 2),
+  only screen and (   -moz-min-device-pixel-ratio: 2),
+  only screen and (     -o-min-device-pixel-ratio: 2/1),
+  only screen and (        min-device-pixel-ratio: 2),
+  only screen and (                min-resolution: 192dpi),
+  only screen and (                min-resolution: 2dppx) {
+    background-image: url(if($bootstrap-sass-asset-helper, twbs-image-path("#{$file-2x}"), "#{$file-2x}"));
+    background-size: $width-1x $height-1x;
+  }
+}
+@mixin img-responsive($display: block) {
+  display: $display;
+  max-width: 100%; // Part 1: Set a maximum relative to the parent
+  height: auto; // Part 2: Scale the height according to the width, otherwise you get stretching
+}
+@mixin nav-divider($color: #e5e5e5) {
+  height: 1px;
+  margin: (($line-height-computed / 2) - 1) 0;
+  overflow: hidden;
+  background-color: $color;
+}
+@mixin panel-variant($border, $heading-text-color, $heading-bg-color, $heading-border) {
+  border-color: $border;
+
+  & > .panel-heading {
+    color: $heading-text-color;
+    background-color: $heading-bg-color;
+    border-color: $heading-border;
+
+    + .panel-collapse .panel-body {
+      border-top-color: $border;
+    }
+  }
+  & > .panel-footer {
+    + .panel-collapse .panel-body {
+      border-bottom-color: $border;
+    }
+  }
+}
+@mixin alert-variant($background, $border, $text-color) {
+  background-color: $background;
+  border-color: $border;
+  color: $text-color;
+
+  hr {
+    border-top-color: darken($border, 5%);
+  }
+  .alert-link {
+    color: darken($text-color, 10%);
+  }
+}
+@mixin table-row-variant($state, $background) {
+  .table > thead > tr,
+  .table > tbody > tr,
+  .table > tfoot > tr {
+    > td.#{$state},
+    > th.#{$state},
+    &.#{$state} > td,
+    &.#{$state} > th {
+      background-color: $background;
+    }
+  }
+  .table-hover > tbody > tr {
+    > td.#{$state}:hover,
+    > th.#{$state}:hover,
+    &.#{$state}:hover > td,
+    &.#{$state}:hover > th {
+      background-color: darken($background, 5%);
+    }
+  }
+}
+@mixin list-group-item-variant($state, $background, $color) {
+  .list-group-item-#{$state} {
+    color: $color;
+    background-color: $background;
+  }
+
+  a.list-group-item-#{$state} {
+    color: $color;
+
+    .list-group-item-heading { color: inherit; }
+
+    &:hover,
+    &:focus {
+      color: $color;
+      background-color: darken($background, 5%);
+    }
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: #fff;
+      background-color: $color;
+      border-color: $color;
+    }
+  }
+}
+@mixin button-variant($color, $background, $border) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: $color;
+    background-color: darken($background, 8%);
+        border-color: darken($border, 12%);
+  }
+  .open & { &.dropdown-toggle {
+    color: $color;
+    background-color: darken($background, 8%);
+        border-color: darken($border, 12%);
+  } }
+  &:active,
+  &.active {
+    background-image: none;
+  }
+  .open & { &.dropdown-toggle {
+    background-image: none;
+  } }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: $background;
+          border-color: $border;
+    }
+  }
+  .badge {
+    color: $background;
+    background-color: $color;
+  }
+}
+@mixin button-size($padding-vertical, $padding-horizontal, $font-size, $line-height, $border-radius) {
+  padding: $padding-vertical $padding-horizontal;
+  font-size: $font-size;
+  line-height: $line-height;
+  border-radius: $border-radius;
+}
+@mixin pagination-size($padding-vertical, $padding-horizontal, $font-size, $border-radius) {
+  > li {
+    > a,
+    > span {
+      padding: $padding-vertical $padding-horizontal;
+      font-size: $font-size;
+    }
+    &:first-child {
+      > a,
+      > span {
+        @include border-left-radius($border-radius);
+      }
+    }
+    &:last-child {
+      > a,
+      > span {
+        @include border-right-radius($border-radius);
+      }
+    }
+  }
+}
+@mixin label-variant($color) {
+  background-color: $color;
+  &[href] {
+    &:hover,
+    &:focus {
+      background-color: darken($color, 10%);
+    }
+  }
+}
+@mixin bg-variant($parent, $color) {
+  #{$parent} {
+    background-color: $color;
+  }
+  a#{$parent}:hover {
+    background-color: darken($color, 10%);
+  }
+}
+@mixin text-emphasis-variant($parent, $color) {
+  #{$parent} {
+    color: $color;
+  }
+  a#{$parent}:hover {
+    color: darken($color, 10%);
+  }
+}
+@mixin navbar-vertical-align($element-height) {
+  margin-top: (($navbar-height - $element-height) / 2);
+  margin-bottom: (($navbar-height - $element-height) / 2);
+}
+@mixin progress-bar-variant($color) {
+  background-color: $color;
+  .progress-striped & {
+    @include gradient-striped();
+  }
+}
+@mixin responsive-visibility($parent) {
+  #{$parent} {
+    display: block !important;
+  }
+  table#{$parent}  { display: table; }
+  tr#{$parent}     { display: table-row !important; }
+  th#{$parent},
+  td#{$parent}     { display: table-cell !important; }
+}
+@mixin responsive-invisibility($parent) {
+  #{$parent} {
+    display: none !important;
+  }
+}
+@mixin container-fixed() {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left:  ($grid-gutter-width / 2);
+  padding-right: ($grid-gutter-width / 2);
+  @include clearfix();
+}
+@mixin make-row($gutter: $grid-gutter-width) {
+  margin-left:  ($gutter / -2);
+  margin-right: ($gutter / -2);
+  @include clearfix();
+}
+@mixin make-xs-column($columns, $gutter: $grid-gutter-width) {
+  position: relative;
+  float: left;
+  width: percentage(($columns / $grid-columns));
+  min-height: 1px;
+  padding-left:  ($gutter / 2);
+  padding-right: ($gutter / 2);
+}
+@mixin make-xs-column-offset($columns) {
+  @media (min-width: $screen-xs-min) {
+    margin-left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-xs-column-push($columns) {
+  @media (min-width: $screen-xs-min) {
+    left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-xs-column-pull($columns) {
+  @media (min-width: $screen-xs-min) {
+    right: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-sm-column($columns, $gutter: $grid-gutter-width) {
+  position: relative;
+  min-height: 1px;
+  padding-left:  ($gutter / 2);
+  padding-right: ($gutter / 2);
+
+  @media (min-width: $screen-sm-min) {
+    float: left;
+    width: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-sm-column-offset($columns) {
+  @media (min-width: $screen-sm-min) {
+    margin-left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-sm-column-push($columns) {
+  @media (min-width: $screen-sm-min) {
+    left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-sm-column-pull($columns) {
+  @media (min-width: $screen-sm-min) {
+    right: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-md-column($columns, $gutter: $grid-gutter-width) {
+  position: relative;
+  min-height: 1px;
+  padding-left:  ($gutter / 2);
+  padding-right: ($gutter / 2);
+
+  @media (min-width: $screen-md-min) {
+    float: left;
+    width: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-md-column-offset($columns) {
+  @media (min-width: $screen-md-min) {
+    margin-left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-md-column-push($columns) {
+  @media (min-width: $screen-md-min) {
+    left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-md-column-pull($columns) {
+  @media (min-width: $screen-md-min) {
+    right: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-lg-column($columns, $gutter: $grid-gutter-width) {
+  position: relative;
+  min-height: 1px;
+  padding-left:  ($gutter / 2);
+  padding-right: ($gutter / 2);
+
+  @media (min-width: $screen-lg-min) {
+    float: left;
+    width: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-lg-column-offset($columns) {
+  @media (min-width: $screen-lg-min) {
+    margin-left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-lg-column-push($columns) {
+  @media (min-width: $screen-lg-min) {
+    left: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-lg-column-pull($columns) {
+  @media (min-width: $screen-lg-min) {
+    right: percentage(($columns / $grid-columns));
+  }
+}
+@mixin make-grid-columns() {
+  $list: '';
+  $i: 1;
+  $list: ".col-xs-#{$i}, .col-sm-#{$i}, .col-md-#{$i}, .col-lg-#{$i}";
+  @for $i from (1 + 1) through $grid-columns {
+    $list: "#{$list}, .col-xs-#{$i}, .col-sm-#{$i}, .col-md-#{$i}, .col-lg-#{$i}";
+  }
+  #{$list} {
+    position: relative;
+    min-height: 1px;
+    padding-left:  ($grid-gutter-width / 2);
+    padding-right: ($grid-gutter-width / 2);
+  }
+}
+@mixin float-grid-columns($class) {
+  $list: '';
+  $i: 1;
+  $list: ".col-#{$class}-#{$i}";
+  @for $i from (1 + 1) through $grid-columns {
+    $list: "#{$list}, .col-#{$class}-#{$i}";
+  }
+  #{$list} {
+    @include rtl-float-left();
+  }
+}
+@mixin calc-grid-column($index, $class, $type) {
+  @if ($type == width) and ($index > 0) {
+    .col-#{$class}-#{$index} {
+      width: percentage(($index / $grid-columns));
+    }
+  }
+  @if ($type == push) {
+    .col-#{$class}-push-#{$index} {
+      left: percentage(($index / $grid-columns));
+    }
+  }
+  @if ($type == pull) {
+    .col-#{$class}-pull-#{$index} {
+      right: percentage(($index / $grid-columns));
+    }
+  }
+  @if ($type == offset) {
+    .col-#{$class}-offset-#{$index} {
+      margin-left: percentage(($index / $grid-columns));
+    }
+  }
+}
+@mixin loop-grid-columns($columns, $class, $type) {
+  @for $i from 0 through $columns {
+    @include calc-grid-column($i, $class, $type);
+  }
+}
+@mixin make-grid($class) {
+  @include float-grid-columns($class);
+  @include loop-grid-columns($grid-columns, $class, width);
+  @include loop-grid-columns($grid-columns, $class, pull);
+  @include loop-grid-columns($grid-columns, $class, push);
+  @include loop-grid-columns($grid-columns, $class, offset);
+}
+@mixin form-control-validation($text-color: #555, $border-color: #ccc, $background-color: #f5f5f5) {
+  // Color the label and help text
+  .help-block,
+  .control-label,
+  .radio,
+  .checkbox,
+  .radio-inline,
+  .checkbox-inline  {
+    color: $text-color;
+  }
+  .form-control {
+    border-color: $border-color;
+    @include box-shadow(inset 0 1px 1px rgba(0,0,0,.075)); // Redeclare so transitions work
+    &:focus {
+      border-color: darken($border-color, 10%);
+      $shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px lighten($border-color, 20%);
+      @include box-shadow($shadow);
+    }
+  }
+  .input-group-addon {
+    color: $text-color;
+    border-color: $border-color;
+    background-color: $background-color;
+  }
+  .form-control-feedback {
+    color: $text-color;
+  }
+}
+@mixin form-control-focus($color: $input-border-focus) {
+  $color-rgba: rgba(red($color), green($color), blue($color), .6);
+  &:focus {
+    border-color: $color;
+    outline: 0;
+    @include box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px $color-rgba);
+  }
+}
+@mixin input-size($parent, $input-height, $padding-vertical, $padding-horizontal, $font-size, $line-height, $border-radius) {
+  #{$parent} {
+    height: $input-height;
+    padding: $padding-vertical $padding-horizontal;
+    font-size: $font-size;
+    line-height: $line-height;
+    border-radius: $border-radius;
+  }
+  select#{$parent} {
+    height: $input-height;
+    line-height: $input-height;
+  }
+  textarea#{$parent},
+  select[multiple]#{$parent} {
+    height: auto;
+  }
+}
+@mixin border-exclude-top($border-deep, $border-type , $border-color ){
+   border-bottom: $border-deep $border-type $border-color ;
+   border-left: $border-deep $border-type $border-color ;
+   border-right: $border-deep $border-type $border-color ;
+}
+@mixin border-exclude-bottom($border-deep, $border-type , $border-color ){
+   border-top: $border-deep $border-type $border-color ;
+   border-left: $border-deep $border-type $border-color ;
+   border-right: $border-deep $border-type $border-color ;
+}
+@mixin border-exclude-left($border-deep, $border-type , $border-color ){
+   border-top: $border-deep $border-type $border-color ;
+   border-bottom: $border-deep $border-type $border-color ;
+   border-right: $border-deep $border-type $border-color ;
+}
+@mixin border-exclude-right($border-deep, $border-type , $border-color ){
+   border-top: $border-deep $border-type $border-color ;
+   border-bottom: $border-deep $border-type $border-color ;
+   border-left: $border-deep $border-type $border-color ;
+}
+@mixin rounded-corners ($radius) {
+   -webkit-border-radius: $radius;
+   -moz-border-radius: $radius;
+   -ms-border-radius: $radius;
+   -o-border-radius: $radius;
+   border-radius: $radius;
+}
+@mixin clearboxstyle(){
+   background: none;
+   border:none;
+}
+@mixin clearfloat(){
+   float: none;
+   width: 100%;
+}
+@mixin transform-style($transform-style){
+   -webkit-transform-style: $transform-style;                    
+   -moz-transform-style: $transform-style;                    
+   -ms-transform-style: $transform-style;                    
+   -o-transform-style: $transform-style;                    
+   transform-style: $transform-style;
+}
+@mixin backface-visibility($backface-visibility){
+   backface-visibility: $backface-visibility;  /* W3C */
+   -webkit-backface-visibility: $backface-visibility; /* Safari & Chrome */
+   -moz-backface-visibility: $backface-visibility; /* Firefox */
+   -ms-backface-visibility: $backface-visibility; /* Internet Explorer */
+   -o-backface-visibility: $backface-visibility; /* Opera */
+}
+@mixin animation-theme($animation-duration, $animation-fill-mode, $animation-name){
+   -webkit-animation-duration: $animation-duration; 
+   -moz-animation-duration: $animation-duration; 
+   -ms-animation-duration: $animation-duration; 
+   -o-animation-duration: $animation-duration; 
+   animation-duration: $animation-duration; 
+
+   -webkit-animation-fill-mode: $animation-fill-mode;
+   -moz-animation-fill-mode: $animation-fill-mode;
+   -ms-animation-fill-mode: $animation-fill-mode;
+   -o-animation-fill-mode: $animation-fill-mode;
+   animation-fill-mode: $animation-fill-mode;
+
+   -webkit-animation-name: $animation-name;
+   -moz-animation-name: $animation-name; 
+   -ms-animation-name: $animation-name; 
+   -o-animation-name: $animation-name; 
+   animation-name: $animation-name; 
+}
+@mixin perspective($perspective){
+   -webkit-perspective: $perspective;
+   -ms-perspective: $perspective;
+   -moz-perspective: $perspective;
+   -o-perspective: $perspective;
+   perspective: $perspective;    
+}
+@mixin transition-timing-function($timing-function) {
+   -moz-transition-timing-function: $timing-function;
+   -o-transition-timing-function: $timing-function;
+   -webkit-transition-timing-function: $timing-function;
+   transition-timing-function: $timing-function;
+}
+@mixin transform($arguments){
+   -webkit-transform: $arguments;
+   -moz-transform:    $arguments;
+   -ms-transform:     $arguments;
+   -o-transform:      $arguments;
+}
+
+@mixin appearance($appearance){
+   appearance: $appearance;
+   -moz-appearance: $appearance;
+   -ms-appearance: $appearance;
+   -o-appearance: $appearance;
+   -webkit-appearance: $appearance; 
+}
+@mixin rgba($colour, $alpha)
+{
+   $alphaColour: hsla(hue($colour), saturation($colour), lightness($colour), $alpha);
+   $ieAlphaColour: argb($alphaColour);   
+   background-color: $colour; 
+   background-color: $alphaColour;       
+   zoom: 1; 
+   background-color: transparent\9;   
+   
+   
+}
+@mixin border-rgba($colour, $alpha)
+{
+   $alphaColour: hsla(hue($colour), saturation($colour), lightness($colour), $alpha);
+   $ieAlphaColour: argb($alphaColour);   
+   border-color: $colour; 
+   border-color: $alphaColour;       
+   zoom: 1; 
+   border-color: transparent\9;
+  
+}
+@mixin sub-heading($sub-heading-bg, $sub-heading-color) {
+  color: $sub-heading-color;
+  a{
+    color: $sub-heading-color;
+    &:hover{
+      color: $sub-heading-color;
+    }
+  }
+  padding: $base-box-padding;
+  position: relative;
+  background: $sub-heading-bg;  
+}
+
+@mixin sub-heading-before {
+  height: 0;
+  width: 0;
+  @include rtl-right(45%);
+  top: 100%;
+  content: "";
+  position: absolute;
+  border: 4px solid transparent;
+  border-top-color: $gray-lighter;
+}
+@mixin background-hover {
+  color: $text-color;
+  background: rgba(228, 50, 40, 0.3);
+}
+@mixin button-variant-outline($color, $background, $border, $colorhover, $bghover, $borderhover ) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+  @include transition(all 0.35s ease);
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: $colorhover;
+    background-color: $bghover;
+    border-color: $borderhover ;
+    @include transition(all 0.35s ease);
+  }
+  .open & { &.dropdown-toggle {
+    color: $colorhover;
+    background-color: $bghover;
+        border-color: $borderhover ;
+  } }
+  &:active,
+  &.active {
+    background-image: none;
+  }
+  .open & { &.dropdown-toggle {
+    background-image: none;
+  } }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: $background;
+          border-color: $border;
+    }
+  }
+
+  .badge {
+    color: $background;
+    background-color: $color;
+  }
+}
+@mixin block-variant($border, $heading-text-color, $heading-bg-color, $heading-border) {
+  border-color: $border;
+
+  & .#{$block-heading-selector} {
+    color: $heading-text-color;
+    a{
+      color: $heading-text-color;
+    }
+    background-color: $heading-bg-color;
+    border-color: $heading-border;
+    + .#{$block-prefix}-collapse .#{$block-content-selector} {
+      border-top-color: $border;
+    }
+  }
+  & > .#{$block-prefix}-footer {
+    + .#{$block-prefix}-collapse .#{$block-prefix}-body {
+      border-bottom-color: $border;
+    }
+  }
+}
+@mixin container-layout-variant($color, $background){
+    background: $background;
+    color: $color;
+}  
+@mixin rtl-base-simple ($property, $direction) {
+  #{$property}:$direction;
+  .rtl & {
+    @if $direction == $rtl-right {
+      #{$property}:$rtl-left;
+    }
+    @else {
+      #{$property}:$rtl-right;
+    }
+  }
+}
+@mixin rtl-base-inherit ($property, $direction, $value, $inherit : inherit) {
+  #{$property}-#{$direction}: $value;
+  .rtl & {
+    @if $direction == $rtl-right {
+      #{$property}-#{$rtl-left}: $value;
+    }
+    @else {
+      #{$property}-#{$rtl-right}: $value;
+    }
+    #{$property}-#{$direction}: $inherit;
+  }
+}
+
+@mixin rtl-base-toprightbottomleft ($property, $t, $r, $b, $l) {
+  #{$property}: $t $r $b $l;
+  .rtl & {
+    #{$property}: $t $l $b $r;
+  }
+}
+@mixin rtl-direction ($forBody : true) {
+  direction: ltr;
+  @if $forBody {
+    &.rtl {
+      direction: rtl;
+    }
+  }
+  @else {
+    .rtl & {
+      direction: rtl;
+    }
+  }
+}
+@mixin rtl-font-family ($ltr, $rtl, $forBody : false) {
+  font-family: $ltr;
+  @if $forBody {
+    &.rtl, &.non-latin {
+      font-family:$rtl;
+    }
+  }
+  @else {
+    .rtl &, .non-latin & {
+      font-family:$rtl;
+    }
+  }
+}
+@mixin rtl-margin ($t, $r, $b, $l) {
+  @include rtl-base-toprightbottomleft(margin,$t, $r, $b, $l);
+}
+@mixin rtl-margin-left ($value) {
+  @include rtl-base-inherit(margin,$rtl-left,$value);
+}
+@mixin rtl-margin-right ($value) {
+  @include rtl-base-inherit(margin,$rtl-right,$value);
+}
+@mixin rtl-padding ($t, $r, $b, $l) {
+  @include rtl-base-toprightbottomleft(padding,$t, $r, $b, $l);
+}
+@mixin rtl-padding-left ($value) {
+  @include rtl-base-inherit(padding,$rtl-left,$value);
+}
+@mixin rtl-padding-right ($value) {
+  @include rtl-base-inherit(padding,$rtl-right,$value);
+}
+@mixin rtl-border-width ($t,$r,$b,$l) {
+  @include rtl-base-toprightbottomleft(border-width,$t,$r,$b,$l);
+}
+@mixin rtl-border-style ($t,$r,$b,$l) {
+  @include rtl-base-toprightbottomleft(border-style,$t,$r,$b,$l);
+}
+@mixin rtl-border-left ($value) {
+  @include rtl-base-inherit(border,$rtl-left,$value);
+}
+@mixin rtl-border-right ($value) {
+  @include rtl-base-inherit(border,$rtl-right,$value);
+}
+@mixin rtl-left ($value) {
+  #{$rtl-left}: $value;
+  .rtl & {
+    #{$rtl-right}: $value;
+    #{$rtl-left}: auto;
+  }
+}
+@mixin rtl-right ($value) {
+  #{$rtl-right}: $value;
+  .rtl & {
+    #{$rtl-left}: $value;
+    #{$rtl-right}: auto;
+  }
+}
+@mixin rtl-text-align-left () {
+  @include rtl-base-simple(text-align, $rtl-left);
+}
+@mixin rtl-text-align-right () {
+  @include rtl-base-simple(text-align, $rtl-right);
+}
+@mixin rtl-float-left () {
+  @include rtl-base-simple(float, $rtl-left);
+}
+@mixin rtl-float-right () {
+  @include rtl-base-simple(float, $rtl-right);
+}
+@mixin rtl-background-position-left ($vertical) {
+  background-position:$rtl-left $vertical !important;
+  .rtl & {
+    background-position:$rtl-right $vertical !important;
+  }
+}
+@mixin rtl-background-position-right ($vertical) {
+  background-position:$rtl-right $vertical;
+  .rtl & {
+    background-position:$rtl-left $vertical;
+  }
+}
+@mixin rtl-background-position-percent ($vertical, $horPercent) {
+  background-position:$horPercent $vertical;
+  .rtl & {
+    background-position:100% - $horPercent $vertical;
+  }
+}
+@mixin rtl-text-shadow ($x, $rest) {
+  text-shadow: $x $rest;
+  .rtl & {
+    text-shadow: -1 * $x $rest;
+  }
+}
+@mixin rtl-box-shadow ($x, $rest) {
+  -moz-box-shadow: $x $rest;
+  -webkit-box-shadow: $x $rest;
+  box-shadow: $x $rest;
+  .rtl & {
+    -moz-box-shadow: -1 * $x $rest;
+    -webkit-box-shadow: -1 * $x $rest;
+    box-shadow: -1 * $x $rest;
+  }
+}
+@mixin rtl-border-radius($tl, $tr, $br, $bl) {
+  -moz-border-radius: $tl $tr $br $bl;
+  -webkit-border-radius: $tl $tr $br $bl;
+  border-radius: $tl $tr $br $bl;
+  .rtl & {
+    -moz-border-radius: $tr $tl $bl $br;
+    -webkit-border-radius: $tr $tl $bl $br;
+    border-radius: $tr $tl $bl $br;
+  }
+}
+@mixin rtl-border-radius-topright ($value) {
+  -moz-border-top-#{$rtl-right}-radius: $value;
+  -webkit-border-top-#{$rtl-right}-radius: $value;
+  border-top-#{$rtl-right}-radius: $value;
+  .rtl & {
+    -moz-border-top-#{$rtl-left}-radius: $value;
+    -webkit-border-top-#{$rtl-left}-radius: $value;
+    border-top-#{$rtl-left}-radius: $value;
+    -moz-border-top-#{$rtl-right}-radius: inherit;
+    -webkit-border-top-#{$rtl-right}-radius: inherit;
+    border-top-#{$rtl-right}-radius: inherit;
+  }
+}
+@mixin rtl-border-radius-bottomright ($value) {
+  -moz-border-bottom-#{$rtl-right}-radius: $value;
+  -webkit-border-bottom-#{$rtl-right}-radius: $value;
+  border-bottom-#{$rtl-right}-radius: $value;
+  .rtl & {
+    -moz-border-bottom-#{$rtl-left}-radius: $value;
+    -webkit-border-bottom-#{$rtl-left}-radius: $value;
+    border-bottom-#{$rtl-left}-radius: $value;
+    -moz-border-bottom-#{$rtl-right}-radius: inherit;
+    -webkit-border-bottom-#{$rtl-right}-radius: inherit;
+    border-bottom-#{$rtl-right}-radius: inherit;
+  }
+}
+@mixin rtl-border-radius-topleft ($value) {
+  -moz-border-top-#{$rtl-left}-radius: $value;
+  -webkit-border-top-#{$rtl-left}-radius: $value;
+  border-top-#{$rtl-left}-radius: $value;
+  .rtl & {
+    -moz-border-top-#{$rtl-right}-radius: $value;
+    -webkit-border-top-#{$rtl-right}-radius: $value;
+    border-top-#{$rtl-right}-radius: $value;
+    -moz-border-top-#{$rtl-left}-radius: inherit;
+    -webkit-border-top-#{$rtl-left}-radius: inherit;
+    border-top-#{$rtl-left}-radius: inherit;
+  }
+}
+@mixin rtl-border-radius-bottomleft ($value) {
+  -moz-border-bottom-#{$rtl-left}-radius: $value;
+  -webkit-border-bottom-#{$rtl-left}-radius: $value;
+  border-bottom-#{$rtl-left}-radius: $value;
+  .rtl & {
+    -moz-border-bottom-#{$rtl-right}-radius: $value;
+    -webkit-border-bottom-#{$rtl-right}-radius: $value;
+    border-bottom-#{$rtl-right}-radius: $value;
+    -moz-border-bottom-#{$rtl-left}-radius: inherit;
+    -webkit-border-bottom-#{$rtl-left}-radius: inherit;
+    border-bottom-#{$rtl-left}-radius: inherit;
+  }
+}
+@mixin inline-block(){
+  display: inline-block;
+  vertical-align: middle;
+}
+@mixin selection {
+    ::-moz-selection { @content; }
+    ::selection { @content; }
+}
+
+/*!
+ *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
+ */@font-face{font-family:'FontAwesome';src:url('../fonts/fontawesome-webfont.eot?v=4.7.0');src:url('../fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'),url('../fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'),url('../fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');font-weight:normal;font-style:normal}.fa{display:inline-block;font:normal normal normal 14px/1 FontAwesome;font-size:inherit;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.fa-lg{font-size:1.33333333em;line-height:.75em;vertical-align:-15%}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-fw{width:1.28571429em;text-align:center}.fa-ul{padding-left:0;margin-left:2.14285714em;list-style-type:none}.fa-ul>li{position:relative}.fa-li{position:absolute;left:-2.14285714em;width:2.14285714em;top:.14285714em;text-align:center}.fa-li.fa-lg{left:-1.85714286em}.fa-border{padding:.2em .25em .15em;border:solid .08em #eee;border-radius:.1em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left{margin-right:.3em}.fa.fa-pull-right{margin-left:.3em}.pull-right{float:right}.pull-left{float:left}.fa.pull-left{margin-right:.3em}.fa.pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}100%{-webkit-transform:rotate(359deg);transform:rotate(359deg)}}.fa-rotate-90{-ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";-webkit-transform:rotate(90deg);-ms-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";-webkit-transform:rotate(180deg);-ms-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";-webkit-transform:rotate(270deg);-ms-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";-webkit-transform:scale(-1, 1);-ms-transform:scale(-1, 1);transform:scale(-1, 1)}.fa-flip-vertical{-ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";-webkit-transform:scale(1, -1);-ms-transform:scale(1, -1);transform:scale(1, -1)}:root .fa-rotate-90,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-flip-horizontal,:root .fa-flip-vertical{filter:none}.fa-stack{position:relative;display:inline-block;width:2em;height:2em;line-height:2em;vertical-align:middle}.fa-stack-1x,.fa-stack-2x{position:absolute;left:0;width:100%;text-align:center}.fa-stack-1x{line-height:inherit}.fa-stack-2x{font-size:2em}.fa-inverse{color:#fff}.fa-glass:before{content:"\f000"}.fa-music:before{content:"\f001"}.fa-search:before{content:"\f002"}.fa-envelope-o:before{content:"\f003"}.fa-heart:before{content:"\f004"}.fa-star:before{content:"\f005"}.fa-star-o:before{content:"\f006"}.fa-user:before{content:"\f007"}.fa-film:before{content:"\f008"}.fa-th-large:before{content:"\f009"}.fa-th:before{content:"\f00a"}.fa-th-list:before{content:"\f00b"}.fa-check:before{content:"\f00c"}.fa-remove:before,.fa-close:before,.fa-times:before{content:"\f00d"}.fa-search-plus:before{content:"\f00e"}.fa-search-minus:before{content:"\f010"}.fa-power-off:before{content:"\f011"}.fa-signal:before{content:"\f012"}.fa-gear:before,.fa-cog:before{content:"\f013"}.fa-trash-o:before{content:"\f014"}.fa-home:before{content:"\f015"}.fa-file-o:before{content:"\f016"}.fa-clock-o:before{content:"\f017"}.fa-road:before{content:"\f018"}.fa-download:before{content:"\f019"}.fa-arrow-circle-o-down:before{content:"\f01a"}.fa-arrow-circle-o-up:before{content:"\f01b"}.fa-inbox:before{content:"\f01c"}.fa-play-circle-o:before{content:"\f01d"}.fa-rotate-right:before,.fa-repeat:before{content:"\f01e"}.fa-refresh:before{content:"\f021"}.fa-list-alt:before{content:"\f022"}.fa-lock:before{content:"\f023"}.fa-flag:before{content:"\f024"}.fa-headphones:before{content:"\f025"}.fa-volume-off:before{content:"\f026"}.fa-volume-down:before{content:"\f027"}.fa-volume-up:before{content:"\f028"}.fa-qrcode:before{content:"\f029"}.fa-barcode:before{content:"\f02a"}.fa-tag:before{content:"\f02b"}.fa-tags:before{content:"\f02c"}.fa-book:before{content:"\f02d"}.fa-bookmark:before{content:"\f02e"}.fa-print:before{content:"\f02f"}.fa-camera:before{content:"\f030"}.fa-font:before{content:"\f031"}.fa-bold:before{content:"\f032"}.fa-italic:before{content:"\f033"}.fa-text-height:before{content:"\f034"}.fa-text-width:before{content:"\f035"}.fa-align-left:before{content:"\f036"}.fa-align-center:before{content:"\f037"}.fa-align-right:before{content:"\f038"}.fa-align-justify:before{content:"\f039"}.fa-list:before{content:"\f03a"}.fa-dedent:before,.fa-outdent:before{content:"\f03b"}.fa-indent:before{content:"\f03c"}.fa-video-camera:before{content:"\f03d"}.fa-photo:before,.fa-image:before,.fa-picture-o:before{content:"\f03e"}.fa-pencil:before{content:"\f040"}.fa-map-marker:before{content:"\f041"}.fa-adjust:before{content:"\f042"}.fa-tint:before{content:"\f043"}.fa-edit:before,.fa-pencil-square-o:before{content:"\f044"}.fa-share-square-o:before{content:"\f045"}.fa-check-square-o:before{content:"\f046"}.fa-arrows:before{content:"\f047"}.fa-step-backward:before{content:"\f048"}.fa-fast-backward:before{content:"\f049"}.fa-backward:before{content:"\f04a"}.fa-play:before{content:"\f04b"}.fa-pause:before{content:"\f04c"}.fa-stop:before{content:"\f04d"}.fa-forward:before{content:"\f04e"}.fa-fast-forward:before{content:"\f050"}.fa-step-forward:before{content:"\f051"}.fa-eject:before{content:"\f052"}.fa-chevron-left:before{content:"\f053"}.fa-chevron-right:before{content:"\f054"}.fa-plus-circle:before{content:"\f055"}.fa-minus-circle:before{content:"\f056"}.fa-times-circle:before{content:"\f057"}.fa-check-circle:before{content:"\f058"}.fa-question-circle:before{content:"\f059"}.fa-info-circle:before{content:"\f05a"}.fa-crosshairs:before{content:"\f05b"}.fa-times-circle-o:before{content:"\f05c"}.fa-check-circle-o:before{content:"\f05d"}.fa-ban:before{content:"\f05e"}.fa-arrow-left:before{content:"\f060"}.fa-arrow-right:before{content:"\f061"}.fa-arrow-up:before{content:"\f062"}.fa-arrow-down:before{content:"\f063"}.fa-mail-forward:before,.fa-share:before{content:"\f064"}.fa-expand:before{content:"\f065"}.fa-compress:before{content:"\f066"}.fa-plus:before{content:"\f067"}.fa-minus:before{content:"\f068"}.fa-asterisk:before{content:"\f069"}.fa-exclamation-circle:before{content:"\f06a"}.fa-gift:before{content:"\f06b"}.fa-leaf:before{content:"\f06c"}.fa-fire:before{content:"\f06d"}.fa-eye:before{content:"\f06e"}.fa-eye-slash:before{content:"\f070"}.fa-warning:before,.fa-exclamation-triangle:before{content:"\f071"}.fa-plane:before{content:"\f072"}.fa-calendar:before{content:"\f073"}.fa-random:before{content:"\f074"}.fa-comment:before{content:"\f075"}.fa-magnet:before{content:"\f076"}.fa-chevron-up:before{content:"\f077"}.fa-chevron-down:before{content:"\f078"}.fa-retweet:before{content:"\f079"}.fa-shopping-cart:before{content:"\f07a"}.fa-folder:before{content:"\f07b"}.fa-folder-open:before{content:"\f07c"}.fa-arrows-v:before{content:"\f07d"}.fa-arrows-h:before{content:"\f07e"}.fa-bar-chart-o:before,.fa-bar-chart:before{content:"\f080"}.fa-twitter-square:before{content:"\f081"}.fa-facebook-square:before{content:"\f082"}.fa-camera-retro:before{content:"\f083"}.fa-key:before{content:"\f084"}.fa-gears:before,.fa-cogs:before{content:"\f085"}.fa-comments:before{content:"\f086"}.fa-thumbs-o-up:before{content:"\f087"}.fa-thumbs-o-down:before{content:"\f088"}.fa-star-half:before{content:"\f089"}.fa-heart-o:before{content:"\f08a"}.fa-sign-out:before{content:"\f08b"}.fa-linkedin-square:before{content:"\f08c"}.fa-thumb-tack:before{content:"\f08d"}.fa-external-link:before{content:"\f08e"}.fa-sign-in:before{content:"\f090"}.fa-trophy:before{content:"\f091"}.fa-github-square:before{content:"\f092"}.fa-upload:before{content:"\f093"}.fa-lemon-o:before{content:"\f094"}.fa-phone:before{content:"\f095"}.fa-square-o:before{content:"\f096"}.fa-bookmark-o:before{content:"\f097"}.fa-phone-square:before{content:"\f098"}.fa-twitter:before{content:"\f099"}.fa-facebook-f:before,.fa-facebook:before{content:"\f09a"}.fa-github:before{content:"\f09b"}.fa-unlock:before{content:"\f09c"}.fa-credit-card:before{content:"\f09d"}.fa-feed:before,.fa-rss:before{content:"\f09e"}.fa-hdd-o:before{content:"\f0a0"}.fa-bullhorn:before{content:"\f0a1"}.fa-bell:before{content:"\f0f3"}.fa-certificate:before{content:"\f0a3"}.fa-hand-o-right:before{content:"\f0a4"}.fa-hand-o-left:before{content:"\f0a5"}.fa-hand-o-up:before{content:"\f0a6"}.fa-hand-o-down:before{content:"\f0a7"}.fa-arrow-circle-left:before{content:"\f0a8"}.fa-arrow-circle-right:before{content:"\f0a9"}.fa-arrow-circle-up:before{content:"\f0aa"}.fa-arrow-circle-down:before{content:"\f0ab"}.fa-globe:before{content:"\f0ac"}.fa-wrench:before{content:"\f0ad"}.fa-tasks:before{content:"\f0ae"}.fa-filter:before{content:"\f0b0"}.fa-briefcase:before{content:"\f0b1"}.fa-arrows-alt:before{content:"\f0b2"}.fa-group:before,.fa-users:before{content:"\f0c0"}.fa-chain:before,.fa-link:before{content:"\f0c1"}.fa-cloud:before{content:"\f0c2"}.fa-flask:before{content:"\f0c3"}.fa-cut:before,.fa-scissors:before{content:"\f0c4"}.fa-copy:before,.fa-files-o:before{content:"\f0c5"}.fa-paperclip:before{content:"\f0c6"}.fa-save:before,.fa-floppy-o:before{content:"\f0c7"}.fa-square:before{content:"\f0c8"}.fa-navicon:before,.fa-reorder:before,.fa-bars:before{content:"\f0c9"}.fa-list-ul:before{content:"\f0ca"}.fa-list-ol:before{content:"\f0cb"}.fa-strikethrough:before{content:"\f0cc"}.fa-underline:before{content:"\f0cd"}.fa-table:before{content:"\f0ce"}.fa-magic:before{content:"\f0d0"}.fa-truck:before{content:"\f0d1"}.fa-pinterest:before{content:"\f0d2"}.fa-pinterest-square:before{content:"\f0d3"}.fa-google-plus-square:before{content:"\f0d4"}.fa-google-plus:before{content:"\f0d5"}.fa-money:before{content:"\f0d6"}.fa-caret-down:before{content:"\f0d7"}.fa-caret-up:before{content:"\f0d8"}.fa-caret-left:before{content:"\f0d9"}.fa-caret-right:before{content:"\f0da"}.fa-columns:before{content:"\f0db"}.fa-unsorted:before,.fa-sort:before{content:"\f0dc"}.fa-sort-down:before,.fa-sort-desc:before{content:"\f0dd"}.fa-sort-up:before,.fa-sort-asc:before{content:"\f0de"}.fa-envelope:before{content:"\f0e0"}.fa-linkedin:before{content:"\f0e1"}.fa-rotate-left:before,.fa-undo:before{content:"\f0e2"}.fa-legal:before,.fa-gavel:before{content:"\f0e3"}.fa-dashboard:before,.fa-tachometer:before{content:"\f0e4"}.fa-comment-o:before{content:"\f0e5"}.fa-comments-o:before{content:"\f0e6"}.fa-flash:before,.fa-bolt:before{content:"\f0e7"}.fa-sitemap:before{content:"\f0e8"}.fa-umbrella:before{content:"\f0e9"}.fa-paste:before,.fa-clipboard:before{content:"\f0ea"}.fa-lightbulb-o:before{content:"\f0eb"}.fa-exchange:before{content:"\f0ec"}.fa-cloud-download:before{content:"\f0ed"}.fa-cloud-upload:before{content:"\f0ee"}.fa-user-md:before{content:"\f0f0"}.fa-stethoscope:before{content:"\f0f1"}.fa-suitcase:before{content:"\f0f2"}.fa-bell-o:before{content:"\f0a2"}.fa-coffee:before{content:"\f0f4"}.fa-cutlery:before{content:"\f0f5"}.fa-file-text-o:before{content:"\f0f6"}.fa-building-o:before{content:"\f0f7"}.fa-hospital-o:before{content:"\f0f8"}.fa-ambulance:before{content:"\f0f9"}.fa-medkit:before{content:"\f0fa"}.fa-fighter-jet:before{content:"\f0fb"}.fa-beer:before{content:"\f0fc"}.fa-h-square:before{content:"\f0fd"}.fa-plus-square:before{content:"\f0fe"}.fa-angle-double-left:before{content:"\f100"}.fa-angle-double-right:before{content:"\f101"}.fa-angle-double-up:before{content:"\f102"}.fa-angle-double-down:before{content:"\f103"}.fa-angle-left:before{content:"\f104"}.fa-angle-right:before{content:"\f105"}.fa-angle-up:before{content:"\f106"}.fa-angle-down:before{content:"\f107"}.fa-desktop:before{content:"\f108"}.fa-laptop:before{content:"\f109"}.fa-tablet:before{content:"\f10a"}.fa-mobile-phone:before,.fa-mobile:before{content:"\f10b"}.fa-circle-o:before{content:"\f10c"}.fa-quote-left:before{content:"\f10d"}.fa-quote-right:before{content:"\f10e"}.fa-spinner:before{content:"\f110"}.fa-circle:before{content:"\f111"}.fa-mail-reply:before,.fa-reply:before{content:"\f112"}.fa-github-alt:before{content:"\f113"}.fa-folder-o:before{content:"\f114"}.fa-folder-open-o:before{content:"\f115"}.fa-smile-o:before{content:"\f118"}.fa-frown-o:before{content:"\f119"}.fa-meh-o:before{content:"\f11a"}.fa-gamepad:before{content:"\f11b"}.fa-keyboard-o:before{content:"\f11c"}.fa-flag-o:before{content:"\f11d"}.fa-flag-checkered:before{content:"\f11e"}.fa-terminal:before{content:"\f120"}.fa-code:before{content:"\f121"}.fa-mail-reply-all:before,.fa-reply-all:before{content:"\f122"}.fa-star-half-empty:before,.fa-star-half-full:before,.fa-star-half-o:before{content:"\f123"}.fa-location-arrow:before{content:"\f124"}.fa-crop:before{content:"\f125"}.fa-code-fork:before{content:"\f126"}.fa-unlink:before,.fa-chain-broken:before{content:"\f127"}.fa-question:before{content:"\f128"}.fa-info:before{content:"\f129"}.fa-exclamation:before{content:"\f12a"}.fa-superscript:before{content:"\f12b"}.fa-subscript:before{content:"\f12c"}.fa-eraser:before{content:"\f12d"}.fa-puzzle-piece:before{content:"\f12e"}.fa-microphone:before{content:"\f130"}.fa-microphone-slash:before{content:"\f131"}.fa-shield:before{content:"\f132"}.fa-calendar-o:before{content:"\f133"}.fa-fire-extinguisher:before{content:"\f134"}.fa-rocket:before{content:"\f135"}.fa-maxcdn:before{content:"\f136"}.fa-chevron-circle-left:before{content:"\f137"}.fa-chevron-circle-right:before{content:"\f138"}.fa-chevron-circle-up:before{content:"\f139"}.fa-chevron-circle-down:before{content:"\f13a"}.fa-html5:before{content:"\f13b"}.fa-css3:before{content:"\f13c"}.fa-anchor:before{content:"\f13d"}.fa-unlock-alt:before{content:"\f13e"}.fa-bullseye:before{content:"\f140"}.fa-ellipsis-h:before{content:"\f141"}.fa-ellipsis-v:before{content:"\f142"}.fa-rss-square:before{content:"\f143"}.fa-play-circle:before{content:"\f144"}.fa-ticket:before{content:"\f145"}.fa-minus-square:before{content:"\f146"}.fa-minus-square-o:before{content:"\f147"}.fa-level-up:before{content:"\f148"}.fa-level-down:before{content:"\f149"}.fa-check-square:before{content:"\f14a"}.fa-pencil-square:before{content:"\f14b"}.fa-external-link-square:before{content:"\f14c"}.fa-share-square:before{content:"\f14d"}.fa-compass:before{content:"\f14e"}.fa-toggle-down:before,.fa-caret-square-o-down:before{content:"\f150"}.fa-toggle-up:before,.fa-caret-square-o-up:before{content:"\f151"}.fa-toggle-right:before,.fa-caret-square-o-right:before{content:"\f152"}.fa-euro:before,.fa-eur:before{content:"\f153"}.fa-gbp:before{content:"\f154"}.fa-dollar:before,.fa-usd:before{content:"\f155"}.fa-rupee:before,.fa-inr:before{content:"\f156"}.fa-cny:before,.fa-rmb:before,.fa-yen:before,.fa-jpy:before{content:"\f157"}.fa-ruble:before,.fa-rouble:before,.fa-rub:before{content:"\f158"}.fa-won:before,.fa-krw:before{content:"\f159"}.fa-bitcoin:before,.fa-btc:before{content:"\f15a"}.fa-file:before{content:"\f15b"}.fa-file-text:before{content:"\f15c"}.fa-sort-alpha-asc:before{content:"\f15d"}.fa-sort-alpha-desc:before{content:"\f15e"}.fa-sort-amount-asc:before{content:"\f160"}.fa-sort-amount-desc:before{content:"\f161"}.fa-sort-numeric-asc:before{content:"\f162"}.fa-sort-numeric-desc:before{content:"\f163"}.fa-thumbs-up:before{content:"\f164"}.fa-thumbs-down:before{content:"\f165"}.fa-youtube-square:before{content:"\f166"}.fa-youtube:before{content:"\f167"}.fa-xing:before{content:"\f168"}.fa-xing-square:before{content:"\f169"}.fa-youtube-play:before{content:"\f16a"}.fa-dropbox:before{content:"\f16b"}.fa-stack-overflow:before{content:"\f16c"}.fa-instagram:before{content:"\f16d"}.fa-flickr:before{content:"\f16e"}.fa-adn:before{content:"\f170"}.fa-bitbucket:before{content:"\f171"}.fa-bitbucket-square:before{content:"\f172"}.fa-tumblr:before{content:"\f173"}.fa-tumblr-square:before{content:"\f174"}.fa-long-arrow-down:before{content:"\f175"}.fa-long-arrow-up:before{content:"\f176"}.fa-long-arrow-left:before{content:"\f177"}.fa-long-arrow-right:before{content:"\f178"}.fa-apple:before{content:"\f179"}.fa-windows:before{content:"\f17a"}.fa-android:before{content:"\f17b"}.fa-linux:before{content:"\f17c"}.fa-dribbble:before{content:"\f17d"}.fa-skype:before{content:"\f17e"}.fa-foursquare:before{content:"\f180"}.fa-trello:before{content:"\f181"}.fa-female:before{content:"\f182"}.fa-male:before{content:"\f183"}.fa-gittip:before,.fa-gratipay:before{content:"\f184"}.fa-sun-o:before{content:"\f185"}.fa-moon-o:before{content:"\f186"}.fa-archive:before{content:"\f187"}.fa-bug:before{content:"\f188"}.fa-vk:before{content:"\f189"}.fa-weibo:before{content:"\f18a"}.fa-renren:before{content:"\f18b"}.fa-pagelines:before{content:"\f18c"}.fa-stack-exchange:before{content:"\f18d"}.fa-arrow-circle-o-right:before{content:"\f18e"}.fa-arrow-circle-o-left:before{content:"\f190"}.fa-toggle-left:before,.fa-caret-square-o-left:before{content:"\f191"}.fa-dot-circle-o:before{content:"\f192"}.fa-wheelchair:before{content:"\f193"}.fa-vimeo-square:before{content:"\f194"}.fa-turkish-lira:before,.fa-try:before{content:"\f195"}.fa-plus-square-o:before{content:"\f196"}.fa-space-shuttle:before{content:"\f197"}.fa-slack:before{content:"\f198"}.fa-envelope-square:before{content:"\f199"}.fa-wordpress:before{content:"\f19a"}.fa-openid:before{content:"\f19b"}.fa-institution:before,.fa-bank:before,.fa-university:before{content:"\f19c"}.fa-mortar-board:before,.fa-graduation-cap:before{content:"\f19d"}.fa-yahoo:before{content:"\f19e"}.fa-google:before{content:"\f1a0"}.fa-reddit:before{content:"\f1a1"}.fa-reddit-square:before{content:"\f1a2"}.fa-stumbleupon-circle:before{content:"\f1a3"}.fa-stumbleupon:before{content:"\f1a4"}.fa-delicious:before{content:"\f1a5"}.fa-digg:before{content:"\f1a6"}.fa-pied-piper-pp:before{content:"\f1a7"}.fa-pied-piper-alt:before{content:"\f1a8"}.fa-drupal:before{content:"\f1a9"}.fa-joomla:before{content:"\f1aa"}.fa-language:before{content:"\f1ab"}.fa-fax:before{content:"\f1ac"}.fa-building:before{content:"\f1ad"}.fa-child:before{content:"\f1ae"}.fa-paw:before{content:"\f1b0"}.fa-spoon:before{content:"\f1b1"}.fa-cube:before{content:"\f1b2"}.fa-cubes:before{content:"\f1b3"}.fa-behance:before{content:"\f1b4"}.fa-behance-square:before{content:"\f1b5"}.fa-steam:before{content:"\f1b6"}.fa-steam-square:before{content:"\f1b7"}.fa-recycle:before{content:"\f1b8"}.fa-automobile:before,.fa-car:before{content:"\f1b9"}.fa-cab:before,.fa-taxi:before{content:"\f1ba"}.fa-tree:before{content:"\f1bb"}.fa-spotify:before{content:"\f1bc"}.fa-deviantart:before{content:"\f1bd"}.fa-soundcloud:before{content:"\f1be"}.fa-database:before{content:"\f1c0"}.fa-file-pdf-o:before{content:"\f1c1"}.fa-file-word-o:before{content:"\f1c2"}.fa-file-excel-o:before{content:"\f1c3"}.fa-file-powerpoint-o:before{content:"\f1c4"}.fa-file-photo-o:before,.fa-file-picture-o:before,.fa-file-image-o:before{content:"\f1c5"}.fa-file-zip-o:before,.fa-file-archive-o:before{content:"\f1c6"}.fa-file-sound-o:before,.fa-file-audio-o:before{content:"\f1c7"}.fa-file-movie-o:before,.fa-file-video-o:before{content:"\f1c8"}.fa-file-code-o:before{content:"\f1c9"}.fa-vine:before{content:"\f1ca"}.fa-codepen:before{content:"\f1cb"}.fa-jsfiddle:before{content:"\f1cc"}.fa-life-bouy:before,.fa-life-buoy:before,.fa-life-saver:before,.fa-support:before,.fa-life-ring:before{content:"\f1cd"}.fa-circle-o-notch:before{content:"\f1ce"}.fa-ra:before,.fa-resistance:before,.fa-rebel:before{content:"\f1d0"}.fa-ge:before,.fa-empire:before{content:"\f1d1"}.fa-git-square:before{content:"\f1d2"}.fa-git:before{content:"\f1d3"}.fa-y-combinator-square:before,.fa-yc-square:before,.fa-hacker-news:before{content:"\f1d4"}.fa-tencent-weibo:before{content:"\f1d5"}.fa-qq:before{content:"\f1d6"}.fa-wechat:before,.fa-weixin:before{content:"\f1d7"}.fa-send:before,.fa-paper-plane:before{content:"\f1d8"}.fa-send-o:before,.fa-paper-plane-o:before{content:"\f1d9"}.fa-history:before{content:"\f1da"}.fa-circle-thin:before{content:"\f1db"}.fa-header:before{content:"\f1dc"}.fa-paragraph:before{content:"\f1dd"}.fa-sliders:before{content:"\f1de"}.fa-share-alt:before{content:"\f1e0"}.fa-share-alt-square:before{content:"\f1e1"}.fa-bomb:before{content:"\f1e2"}.fa-soccer-ball-o:before,.fa-futbol-o:before{content:"\f1e3"}.fa-tty:before{content:"\f1e4"}.fa-binoculars:before{content:"\f1e5"}.fa-plug:before{content:"\f1e6"}.fa-slideshare:before{content:"\f1e7"}.fa-twitch:before{content:"\f1e8"}.fa-yelp:before{content:"\f1e9"}.fa-newspaper-o:before{content:"\f1ea"}.fa-wifi:before{content:"\f1eb"}.fa-calculator:before{content:"\f1ec"}.fa-paypal:before{content:"\f1ed"}.fa-google-wallet:before{content:"\f1ee"}.fa-cc-visa:before{content:"\f1f0"}.fa-cc-mastercard:before{content:"\f1f1"}.fa-cc-discover:before{content:"\f1f2"}.fa-cc-amex:before{content:"\f1f3"}.fa-cc-paypal:before{content:"\f1f4"}.fa-cc-stripe:before{content:"\f1f5"}.fa-bell-slash:before{content:"\f1f6"}.fa-bell-slash-o:before{content:"\f1f7"}.fa-trash:before{content:"\f1f8"}.fa-copyright:before{content:"\f1f9"}.fa-at:before{content:"\f1fa"}.fa-eyedropper:before{content:"\f1fb"}.fa-paint-brush:before{content:"\f1fc"}.fa-birthday-cake:before{content:"\f1fd"}.fa-area-chart:before{content:"\f1fe"}.fa-pie-chart:before{content:"\f200"}.fa-line-chart:before{content:"\f201"}.fa-lastfm:before{content:"\f202"}.fa-lastfm-square:before{content:"\f203"}.fa-toggle-off:before{content:"\f204"}.fa-toggle-on:before{content:"\f205"}.fa-bicycle:before{content:"\f206"}.fa-bus:before{content:"\f207"}.fa-ioxhost:before{content:"\f208"}.fa-angellist:before{content:"\f209"}.fa-cc:before{content:"\f20a"}.fa-shekel:before,.fa-sheqel:before,.fa-ils:before{content:"\f20b"}.fa-meanpath:before{content:"\f20c"}.fa-buysellads:before{content:"\f20d"}.fa-connectdevelop:before{content:"\f20e"}.fa-dashcube:before{content:"\f210"}.fa-forumbee:before{content:"\f211"}.fa-leanpub:before{content:"\f212"}.fa-sellsy:before{content:"\f213"}.fa-shirtsinbulk:before{content:"\f214"}.fa-simplybuilt:before{content:"\f215"}.fa-skyatlas:before{content:"\f216"}.fa-cart-plus:before{content:"\f217"}.fa-cart-arrow-down:before{content:"\f218"}.fa-diamond:before{content:"\f219"}.fa-ship:before{content:"\f21a"}.fa-user-secret:before{content:"\f21b"}.fa-motorcycle:before{content:"\f21c"}.fa-street-view:before{content:"\f21d"}.fa-heartbeat:before{content:"\f21e"}.fa-venus:before{content:"\f221"}.fa-mars:before{content:"\f222"}.fa-mercury:before{content:"\f223"}.fa-intersex:before,.fa-transgender:before{content:"\f224"}.fa-transgender-alt:before{content:"\f225"}.fa-venus-double:before{content:"\f226"}.fa-mars-double:before{content:"\f227"}.fa-venus-mars:before{content:"\f228"}.fa-mars-stroke:before{content:"\f229"}.fa-mars-stroke-v:before{content:"\f22a"}.fa-mars-stroke-h:before{content:"\f22b"}.fa-neuter:before{content:"\f22c"}.fa-genderless:before{content:"\f22d"}.fa-facebook-official:before{content:"\f230"}.fa-pinterest-p:before{content:"\f231"}.fa-whatsapp:before{content:"\f232"}.fa-server:before{content:"\f233"}.fa-user-plus:before{content:"\f234"}.fa-user-times:before{content:"\f235"}.fa-hotel:before,.fa-bed:before{content:"\f236"}.fa-viacoin:before{content:"\f237"}.fa-train:before{content:"\f238"}.fa-subway:before{content:"\f239"}.fa-medium:before{content:"\f23a"}.fa-yc:before,.fa-y-combinator:before{content:"\f23b"}.fa-optin-monster:before{content:"\f23c"}.fa-opencart:before{content:"\f23d"}.fa-expeditedssl:before{content:"\f23e"}.fa-battery-4:before,.fa-battery:before,.fa-battery-full:before{content:"\f240"}.fa-battery-3:before,.fa-battery-three-quarters:before{content:"\f241"}.fa-battery-2:before,.fa-battery-half:before{content:"\f242"}.fa-battery-1:before,.fa-battery-quarter:before{content:"\f243"}.fa-battery-0:before,.fa-battery-empty:before{content:"\f244"}.fa-mouse-pointer:before{content:"\f245"}.fa-i-cursor:before{content:"\f246"}.fa-object-group:before{content:"\f247"}.fa-object-ungroup:before{content:"\f248"}.fa-sticky-note:before{content:"\f249"}.fa-sticky-note-o:before{content:"\f24a"}.fa-cc-jcb:before{content:"\f24b"}.fa-cc-diners-club:before{content:"\f24c"}.fa-clone:before{content:"\f24d"}.fa-balance-scale:before{content:"\f24e"}.fa-hourglass-o:before{content:"\f250"}.fa-hourglass-1:before,.fa-hourglass-start:before{content:"\f251"}.fa-hourglass-2:before,.fa-hourglass-half:before{content:"\f252"}.fa-hourglass-3:before,.fa-hourglass-end:before{content:"\f253"}.fa-hourglass:before{content:"\f254"}.fa-hand-grab-o:before,.fa-hand-rock-o:before{content:"\f255"}.fa-hand-stop-o:before,.fa-hand-paper-o:before{content:"\f256"}.fa-hand-scissors-o:before{content:"\f257"}.fa-hand-lizard-o:before{content:"\f258"}.fa-hand-spock-o:before{content:"\f259"}.fa-hand-pointer-o:before{content:"\f25a"}.fa-hand-peace-o:before{content:"\f25b"}.fa-trademark:before{content:"\f25c"}.fa-registered:before{content:"\f25d"}.fa-creative-commons:before{content:"\f25e"}.fa-gg:before{content:"\f260"}.fa-gg-circle:before{content:"\f261"}.fa-tripadvisor:before{content:"\f262"}.fa-odnoklassniki:before{content:"\f263"}.fa-odnoklassniki-square:before{content:"\f264"}.fa-get-pocket:before{content:"\f265"}.fa-wikipedia-w:before{content:"\f266"}.fa-safari:before{content:"\f267"}.fa-chrome:before{content:"\f268"}.fa-firefox:before{content:"\f269"}.fa-opera:before{content:"\f26a"}.fa-internet-explorer:before{content:"\f26b"}.fa-tv:before,.fa-television:before{content:"\f26c"}.fa-contao:before{content:"\f26d"}.fa-500px:before{content:"\f26e"}.fa-amazon:before{content:"\f270"}.fa-calendar-plus-o:before{content:"\f271"}.fa-calendar-minus-o:before{content:"\f272"}.fa-calendar-times-o:before{content:"\f273"}.fa-calendar-check-o:before{content:"\f274"}.fa-industry:before{content:"\f275"}.fa-map-pin:before{content:"\f276"}.fa-map-signs:before{content:"\f277"}.fa-map-o:before{content:"\f278"}.fa-map:before{content:"\f279"}.fa-commenting:before{content:"\f27a"}.fa-commenting-o:before{content:"\f27b"}.fa-houzz:before{content:"\f27c"}.fa-vimeo:before{content:"\f27d"}.fa-black-tie:before{content:"\f27e"}.fa-fonticons:before{content:"\f280"}.fa-reddit-alien:before{content:"\f281"}.fa-edge:before{content:"\f282"}.fa-credit-card-alt:before{content:"\f283"}.fa-codiepie:before{content:"\f284"}.fa-modx:before{content:"\f285"}.fa-fort-awesome:before{content:"\f286"}.fa-usb:before{content:"\f287"}.fa-product-hunt:before{content:"\f288"}.fa-mixcloud:before{content:"\f289"}.fa-scribd:before{content:"\f28a"}.fa-pause-circle:before{content:"\f28b"}.fa-pause-circle-o:before{content:"\f28c"}.fa-stop-circle:before{content:"\f28d"}.fa-stop-circle-o:before{content:"\f28e"}.fa-shopping-bag:before{content:"\f290"}.fa-shopping-basket:before{content:"\f291"}.fa-hashtag:before{content:"\f292"}.fa-bluetooth:before{content:"\f293"}.fa-bluetooth-b:before{content:"\f294"}.fa-percent:before{content:"\f295"}.fa-gitlab:before{content:"\f296"}.fa-wpbeginner:before{content:"\f297"}.fa-wpforms:before{content:"\f298"}.fa-envira:before{content:"\f299"}.fa-universal-access:before{content:"\f29a"}.fa-wheelchair-alt:before{content:"\f29b"}.fa-question-circle-o:before{content:"\f29c"}.fa-blind:before{content:"\f29d"}.fa-audio-description:before{content:"\f29e"}.fa-volume-control-phone:before{content:"\f2a0"}.fa-braille:before{content:"\f2a1"}.fa-assistive-listening-systems:before{content:"\f2a2"}.fa-asl-interpreting:before,.fa-american-sign-language-interpreting:before{content:"\f2a3"}.fa-deafness:before,.fa-hard-of-hearing:before,.fa-deaf:before{content:"\f2a4"}.fa-glide:before{content:"\f2a5"}.fa-glide-g:before{content:"\f2a6"}.fa-signing:before,.fa-sign-language:before{content:"\f2a7"}.fa-low-vision:before{content:"\f2a8"}.fa-viadeo:before{content:"\f2a9"}.fa-viadeo-square:before{content:"\f2aa"}.fa-snapchat:before{content:"\f2ab"}.fa-snapchat-ghost:before{content:"\f2ac"}.fa-snapchat-square:before{content:"\f2ad"}.fa-pied-piper:before{content:"\f2ae"}.fa-first-order:before{content:"\f2b0"}.fa-yoast:before{content:"\f2b1"}.fa-themeisle:before{content:"\f2b2"}.fa-google-plus-circle:before,.fa-google-plus-official:before{content:"\f2b3"}.fa-fa:before,.fa-font-awesome:before{content:"\f2b4"}.fa-handshake-o:before{content:"\f2b5"}.fa-envelope-open:before{content:"\f2b6"}.fa-envelope-open-o:before{content:"\f2b7"}.fa-linode:before{content:"\f2b8"}.fa-address-book:before{content:"\f2b9"}.fa-address-book-o:before{content:"\f2ba"}.fa-vcard:before,.fa-address-card:before{content:"\f2bb"}.fa-vcard-o:before,.fa-address-card-o:before{content:"\f2bc"}.fa-user-circle:before{content:"\f2bd"}.fa-user-circle-o:before{content:"\f2be"}.fa-user-o:before{content:"\f2c0"}.fa-id-badge:before{content:"\f2c1"}.fa-drivers-license:before,.fa-id-card:before{content:"\f2c2"}.fa-drivers-license-o:before,.fa-id-card-o:before{content:"\f2c3"}.fa-quora:before{content:"\f2c4"}.fa-free-code-camp:before{content:"\f2c5"}.fa-telegram:before{content:"\f2c6"}.fa-thermometer-4:before,.fa-thermometer:before,.fa-thermometer-full:before{content:"\f2c7"}.fa-thermometer-3:before,.fa-thermometer-three-quarters:before{content:"\f2c8"}.fa-thermometer-2:before,.fa-thermometer-half:before{content:"\f2c9"}.fa-thermometer-1:before,.fa-thermometer-quarter:before{content:"\f2ca"}.fa-thermometer-0:before,.fa-thermometer-empty:before{content:"\f2cb"}.fa-shower:before{content:"\f2cc"}.fa-bathtub:before,.fa-s15:before,.fa-bath:before{content:"\f2cd"}.fa-podcast:before{content:"\f2ce"}.fa-window-maximize:before{content:"\f2d0"}.fa-window-minimize:before{content:"\f2d1"}.fa-window-restore:before{content:"\f2d2"}.fa-times-rectangle:before,.fa-window-close:before{content:"\f2d3"}.fa-times-rectangle-o:before,.fa-window-close-o:before{content:"\f2d4"}.fa-bandcamp:before{content:"\f2d5"}.fa-grav:before{content:"\f2d6"}.fa-etsy:before{content:"\f2d7"}.fa-imdb:before{content:"\f2d8"}.fa-ravelry:before{content:"\f2d9"}.fa-eercast:before{content:"\f2da"}.fa-microchip:before{content:"\f2db"}.fa-snowflake-o:before{content:"\f2dc"}.fa-superpowers:before{content:"\f2dd"}.fa-wpexplorer:before{content:"\f2de"}.fa-meetup:before{content:"\f2e0"}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);border:0}.sr-only-focusable:active,.sr-only-focusable:focus{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}
+
+
+/* */
+.clearfix {
+  @include clearfix();
+}
+// Container widths
+//
+// Set the container width, and override it for fixed navbars in media queries.
+
+.container {
+  @include container-fixed();
+  @media (min-width: $screen-sm-min) {
+    width:750px;
+  }
+  @media (min-width: $screen-md-min) {
+    width: $container-md;
+  }
+  @media (min-width: $screen-lg-min) {
+    width: $container-lg;
+  }
+
+}
+
+
+// Fluid container
+//
+// Utilizes the mixin meant for fixed width containers, but without any defined
+// width for fluid, full width layouts.
+
+.container-fluid {
+  //@include container-fixed();
+}
+
+
+// Row
+//
+// Rows contain and clear the floats of your columns.
+
+.row {
+  @include make-row();
+}
+
+
+// Columns
+//
+// Common styles for small and large grid columns
+
+@include make-grid-columns();
+
+
+// Extra small grid
+//
+// Columns, offsets, pushes, and pulls for extra small devices like
+// smartphones.
+
+@include make-grid(xs);
+
+
+// Small grid
+
+
+@media (min-width: $screen-sm-min) {
+  @include make-grid(sm);
+}
+
+
+// Medium grid
+
+
+@media (min-width: $screen-md-min) {
+  @include make-grid(md);
+}
+
+
+// Large grid
+
+
+@media (min-width: $screen-lg-min) {
+  @include make-grid(lg);
+}
+
+//my col
+
+// Common styles for small and large grid columns
+.col-xs-2-4,
+.col-xs-4-8,
+.col-xs-7-2,
+.col-xs-9-6,
+
+.col-sm-2-4,
+.col-sm-4-8,
+.col-sm-7-2,
+.col-sm-9-6,
+
+.col-md-2-4,
+.col-md-4-8,
+.col-md-7-2,
+.col-md-9-6,
+
+.col-lg-2-4,
+.col-lg-4-8,
+.col-lg-7-2,
+.col-lg-9-6
+{
+  position: relative;
+  // Prevent columns from collapsing when empty
+  min-height: 1px;
+  // Inner gutter via padding
+  padding-left:  ($grid-gutter-width / 2);
+  padding-right: ($grid-gutter-width / 2);
+}
+
+@media (max-width: $screen-phone) {
+
+  .col-sp-2-4 , .col-sp-4-8,
+  .col-sp-7-2, .col-sp-9-6 {float: left;}
+
+  .hidden-sp {display: none!important;}
+  
+  @include make-grid(sp);
+
+  .col-sp-7-2 { width: percentage((7.2 / $grid-columns)); }
+  .col-sp-4-8 { width: percentage((4.8 / $grid-columns)); }
+  .col-sp-2-4 { width: percentage((2.4 / $grid-columns)); }
+  .col-sp-9-6 { width: percentage((9.6 / $grid-columns)); }
+}
+
+@media (max-width: $screen-tablet) and (min-width: $screen-phone + 1) {
+  .col-xs-2-4 , .col-xs-4-8,
+  .col-xs-7-2, .col-xs-9-6 {float: left;}
+
+  .col-xs-2-4  { width: percentage((2.4 / $grid-columns)); }
+  .col-xs-4-8  { width: percentage((4.8 / $grid-columns)); }
+  .col-xs-7-2  { width: percentage((7.2 / $grid-columns)); }
+  .col-xs-9-6  { width: percentage((9.6 / $grid-columns)); }
+}
+
+@media (min-width: $screen-tablet) {
+  .col-sm-2-4 , .col-sm-4-8,
+  .col-sm-7-2, .col-sm-9-6 {float: left;}
+
+  .col-sm-2-4  { width: percentage((2.4 / $grid-columns)); }
+  .col-sm-4-8  { width: percentage((4.8 / $grid-columns)); }
+  .col-sm-7-2  { width: percentage((7.2 / $grid-columns)); }
+  .col-sm-9-6  { width: percentage((9.6 / $grid-columns)); }
+}
+
+@media (min-width: $screen-desktop) {
+  .col-md-2-4 , .col-md-4-8,
+  .col-md-7-2, .col-md-9-6 {float: left;}
+
+  .col-md-2-4  { width: percentage((2.4 / $grid-columns)); }
+  .col-md-4-8  { width: percentage((4.8 / $grid-columns)); }
+  .col-md-7-2  { width: percentage((7.2 / $grid-columns)); }
+  .col-md-9-6  { width: percentage((9.6 / $grid-columns)); }
+}
+
+
+@media (min-width: $screen-lg-desktop){
+  .col-lg-2-4 , .col-lg-4-8,
+  .col-lg-7-2, .col-lg-9-6 {float: left;}
+
+  .col-lg-2-4  { width: percentage((2.4 / $grid-columns)); }
+  .col-lg-4-8  { width: percentage((4.8 / $grid-columns)); }
+  .col-lg-7-2  { width: percentage((7.2 / $grid-columns)); }
+  .col-lg-9-6  { width: percentage((9.6 / $grid-columns)); }
+}
+@include responsive-invisibility('.visible-xs, .visible-sm, .visible-md, .visible-lg');
+
+@media (max-width: $screen-xs-max) {
+  @include responsive-visibility('.visible-xs');
+}
+
+@media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+  @include responsive-visibility('.visible-sm');
+}
+
+@media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+  @include responsive-visibility('.visible-md');
+}
+@media (min-width: $screen-lg-min) {
+  @include responsive-visibility('.visible-lg');
+}
+@media (max-width: $screen-xs-max) {
+  @include responsive-invisibility('.hidden-xs');
+}
+
+@media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+  @include responsive-invisibility('.hidden-sm');
+}
+
+@media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+  @include responsive-invisibility('.hidden-md');
+}
+
+@media (min-width: $screen-lg-min) {
+  @include responsive-invisibility('.hidden-lg');
+}
+
+
+// Print utilities
+//
+// Media queries are placed on the inside to be mixin-friendly.
+
+@include responsive-invisibility('.visible-print');
+
+@media print {
+  @include responsive-visibility('.visible-print');
+}
+
+@media print {
+  @include responsive-invisibility('.hidden-print');
+}
