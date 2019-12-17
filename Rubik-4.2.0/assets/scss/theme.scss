@@ -87,6 +87,17 @@
 @import "components/customscss/mixin";
 
 /*********************** STYLE *************************/
+.productlist-hp{
+    margin-top: 50px;
+}
+.bkt--brand{
+    display: none !important;
+}
+.page{
+    .page-content{
+        margin-bottom: 40px;
+    }
+}
 a,ul{
 	outline: none;
 }
@@ -131,6 +142,9 @@ body{
     		color: stencilColor("color-textSecondary");
     		font-size: $fontSize-root;
     	}
+    }
+    @media(max-width:1199px){
+        margin-bottom: 30px;
     }
 }
 .header-top{
@@ -969,7 +983,7 @@ body{
 	    }
 	}
 }
-.productCarousel,#product-listing-container .productGrid{
+.productCarousel,#product-listing-container .productGrid, .productlist-hp .productGrid{
 	.slick-dots{
 		margin-top: 30px;
 		position: static;

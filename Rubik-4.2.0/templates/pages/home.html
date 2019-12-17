@@ -108,7 +108,7 @@ blog:
         </div>
     </div> 
     {{#if products.featured}}
-    <div class="container">
+    <div class="container productlist-hp">
         <div class="row"> 
         {{> components/products/featured products=products.featured columns=theme_settings.homepage_featured_products_column_count}}
         </div>
@@ -181,7 +181,7 @@ blog:
     {{/if}}
     {{{region name="home_below_new_products"}}}
      {{#if products.top_sellers}}
-     <div class="container">
+     <div class="container productlist-hp">
         <div class="row"> 
             {{> components/products/top products=products.top_sellers columns=theme_settings.homepage_top_products_column_count}}
         </div>
